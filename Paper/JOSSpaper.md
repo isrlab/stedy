@@ -37,7 +37,7 @@ The dynamics of tensegrity systems is governed by multi-body dynamics, given by 
 
 `STEDY` was designed to be used by researchers looking to simulate tensegrity dynamics without having to derive the differential equations for any structure in particular. The inputs that are required from the user are simply the parameters that uniquely define the tensegrity structure (initial nodal configuration, connectivity), the material and geometric properties, and simulation environment properties (inertially fixed nodes, external forces, duration, ODE solver options).
 
-The software documentation and the paper cited below (contact us for a copy) comprehensively cover the functionality and the theory behind the Lagrangian formulation and the novel constraint correction method implemented in the package. We shall seek to incorporate techniques introducing control of the dynamic tensegrity system in future versions of the software.
+The software documentation and the paper cited below (contact us for a copy) comprehensively cover the functionality and the theory behind the Lagrangian formulation and the novel constraint correction method implemented in the package. We shall seek to incorporate techniques introducing control of dynamic tensegrity systems in future versions of the software. 
 
 # Acknowledgements
 
