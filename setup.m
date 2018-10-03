@@ -10,19 +10,19 @@ cd Main
 check = exist('ODE_helperFiles');
 if(check == 0)
     mkdir ODE_helperFiles
+    copyfile(strcat(srcLoc),'ODE_helperFiles');
 end
 
 srcLoc = [matlabroot filesep 'toolbox' filesep 'matlab' filesep 'funfun' filesep 'private'];
 odeLoc = [matlabroot filesep 'toolbox' filesep 'matlab' filesep 'funfun' filesep 'ode45.m'];
 
-copyfile(strcat(srcLoc),'ODE_helperFiles');
 copyfile(strcat(odeLoc),'ode45m.m');
 addpath([pwd filesep 'ODE_helperFiles']);
 
 % Edit ode45m to add constraint correction function call and change
 % function name
 fileattrib ode45m.m +w;
-
+fileattrib('ODE_helperFiles/','+w');
 fileID = fopen('ode45m.m','r');
 formatSpec = '%c';
 str = fscanf(fileID,formatSpec);
@@ -44,4 +44,4 @@ else
     fclose(fileID);
 end
 
-pwd
+cd ..;
