@@ -1,4 +1,6 @@
-# STEDY
+[![Documentation](https://img.shields.io/badge/documentation-user_guide-brightgreen.svg)](UserGuide.md)
+[![MIT Licence](https://img.shields.io/badge/license-MIT-yellowgreen.svg)](https://opensource.org/licenses/MIT/)
+# Summary
 
 STEDY is a software package based on MATLAB to enable researchers to simulate dynamics of tensegrity structures. We have developed a Lagrangian formulation for deriving the algebraic differential equations governing the dynamics of classical tensegrity systems. The framework is general enough to allow modeling of general multi-body systems with actuated joints. Furthermore, with the help of the direct correction method that minimizes both geometric and energy constraint violations, errors that arise from numerical integration are corrected on the position and velocity levels, thereby improving simulation accuracy.
 
@@ -55,7 +57,10 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
     function varargout = ode45m(ode,tspan,y0,options,varargin)
     ```
 
+Follow *stedy*'s [User Guide] to get started.
 ### References
 1. Shao-Chen Hsu, Vaishnav Tadiparthi and Raktim Bhattacharya, "A Lagrangian Formulation for Constrained Multibody Dynamics in Tensegrity Systems", Manuscript submitted for publication.
 
     Please contact the authors at addyhsu@tamu.edu or vaishnavtv@tamu.edu for a copy of the submitted paper.
+
+[User Guide]: (UserGuide.md)
