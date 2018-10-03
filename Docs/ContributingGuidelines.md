@@ -1,0 +1,35 @@
+# Contributing guidelines
+
+## How to contribute
+
+This project accepts contributions from anyone interested in improving it. To do so, follow these steps:
+
+1. [Fork it](https://github.com/uqLab/stedy/fork)
+2. Improve it, respecting the <a href="#codstand">coding standards</a> and
+using proper [commit messages](https://chris.beams.io/posts/git-commit/)
+3. Submit a [pull request](https://help.github.com/articles/creating-a-pull-request)
+
+Your work will then be reviewed as soon as possible (suggestions about some
+changes, improvements or alternatives may be given).
+
+<a name="codstand" />
+
+## Coding standards
+
+* Code must work in [MATLAB] (>= 2016a).
+* MATLAB-style documentation and comments.
+* Encoding: UTF-8.
+* Line size limit: 75 chars.
+* Newlines: Unix style, i.e. LF or \n.
+
+## Issues and support
+
+Problems with this software can be reported in the [issues section](https://github.com/uqLab/stedy/issues).
+Support for *stedy* is provided on best effort basis by emailing the author at vaishnavtv@tamu.edu.
+
+#### Note
+
+This document is partially adapted from the [TempoSimple](https://github.com/gnugat-legacy/tempo-simple/blob/master/CONTRIBUTING.md)
+contributing guidelines.
+
+[MATLAB]: http://www.mathworks.com/products/matlab/
