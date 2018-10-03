@@ -36,8 +36,8 @@ strings.E = 7e7*ones(1,tData.nStr); % Young's Modulus of Nylon
 strings.rLP = [1 0.7 1 0.7];  % Rest lengths of the strings: 0.7 means 70% 
 
 % Bars
-bars.rho = 500*ones(1,tData.nBar);
-bars.r = 0.05*ones(1,tData.nBar);
+bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
+bars.rho = 500*ones(1,tData.nBar); % Density of bars
 
 % Point Masses
 Mp = ones(1,tData.nPm); % All point masses initialised with a mass of 1
@@ -52,9 +52,10 @@ tData = tensegGenMat(tData,bars,strings,Mp,g);
 %% Simulation Inputs
 tData.F = 0; % If 1, external force present in structure, else no external forces.
 tData.Correction = 1; % If 1, constraint correction inclusive of total energy constraint If 0, only linear and bar length constraint violations corrected. 
-tData.damper = ones(1,tData.nStr);
+tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
 
-tEnd = 20; % Simulation End Time
+%% Final Simulation
+tEnd = 10; % Simulation End Time
 
 x0 = [x0;0]; % Initial Condition - [Position; Velocity; Energy];
 
@@ -67,7 +68,7 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
 % Plot Configuration
 AZ = 0; % Azimuth angle in degrees
 EL = 0; % Elevation angle in degrees
-axLims = [-1 1 -4 4 -8 8]; % Axis Limits in the figure window
+axLims = [-6 6 -6 6 -8 8]; % Axis Limits in the figure window
 
 plot_configuration(N(:),tData,AZ,EL,axLims);
 
@@ -80,4 +81,4 @@ plotConstr(t,y,tData);
 % Animation
 frameRate = 1/0.05;
 time_loc = [0.5 0 5];
-animateTenseg(t,y,tData,time_loc,'TEST_TBar.mp4','mpeg-4',frameRate,AZ,EL,axLims);
+animateTenseg(t,y,tData,time_loc,'TBar_Animation.mp4','mpeg-4',frameRate,AZ,EL,axLims);

@@ -144,7 +144,7 @@ plotConstr(t,y,tData);
 % AZ, EL and axLims shall be the same as used in plot_configuration
 frameRate = 1/0.05; % Video Framerate
 time_loc = [0 0 4]; % Location of displayed time, can be chosen differently by the user
-animateTenseg(t,y,tData,time_loc,'Template.mp4','MPEG-4',frameRate,AZ, EL,axLims);
+animateTenseg(t,y,tData,time_loc,'DBar_Animation.mp4','MPEG-4',frameRate,AZ, EL,axLims);
 % The user is encouraged to look further at MATLAB documentation on
 % VideoWriter to see what video formats are allowed. 
 

@@ -117,14 +117,8 @@ tData = tensegGenMat(tData,bars,strings,Mp,g);
 %% Simulation Inputs
 tData.F = 1; % If 1, external force present in structure, else no external forces.
 tData.Correction = 1; % If 1, constraint correction inclusive of total energy constraint If 0, only linear and bar length constraint violations corrected. 
-
-tEnd = 20; % Simulation End Time
-
-x0 = [x0;0]; % Initial Condition - [Position; Velocity; Work];
-
-options = odeset('RelTol',1e-10,'AbsTol',1e-10); % ODE options
-
-[t,y] = tensegSim(x0,tEnd,tData,options);
+% tData.damper = 0.2*ones(1,tData.nStr);
+% Dampers are not being used on strings in this example. 
 
 %% Equilibrium
 % To find force densities in the bars and strings at equilibrium when
@@ -132,12 +126,21 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10); % ODE options
 tData.minforce = 1; % Lower bound for force densities in the strings
 tData = tensegEq(x0,N(:),tData);
 
+%% Final Simulation
+tEnd = 5; % Simulation End Time
+
+x0 = [x0;0]; % Initial Condition - [Position; Velocity; Work];
+
+options = odeset('RelTol',1e-10,'AbsTol',1e-10); % ODE options
+
+[t,y] = tensegSim(x0,tEnd,tData,options);
+
 %% Plotting
 
 % Plot configuration
 AZ = 0; % Azimuth angle in degrees
 EL = 0; % Elevation angle in degrees
-axLims = [-2.5 4.5 -4 4 -4 0]; 
+axLims = [-2.5 4.5 -4 4 -4 4]; 
 
 plot_configuration(N(:),tData,AZ,EL,axLims);
 
@@ -150,5 +153,5 @@ plotConstr(t,y,tData);
 % Animation
 frameRate = 1/0.05;
 time_loc = [1 0 2.5];
-animateTenseg(t,y,tData,time_loc,'TEST_ARM.mp4','MPEG-4',frameRate,AZ,EL,axLims);
+animateTenseg(t,y,tData,time_loc,'Arm_Animation.mp4','MPEG-4',frameRate,AZ,EL,axLims);
 
