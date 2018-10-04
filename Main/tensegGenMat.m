@@ -131,9 +131,7 @@ if(tData.nStr>0)
     tData.Lk = Lk;
     tData.K = K;
 end
-
 tData.Vs = Vs;
-
 tData.bars = bars;
 tData.strings = strings;
 
