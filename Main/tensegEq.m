@@ -87,7 +87,7 @@ if(tData.nStr>0)
     tData.Lk = Lk;
     tData.K = K;
 end 
+tData.Vs = Vs;
 tData.sigmaEq = sigma; % Force densities in springs at equilibrium
-tData.Energy = 0.5*x0(3*tData.nNodes+1:end)'*tData.M*x0(3*tData.nNodes+1:end)-tData.G'*x0(1:3*tData.nNodes)+Vs;
 
 end
