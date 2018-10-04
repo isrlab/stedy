@@ -1,5 +1,5 @@
 [![Documentation](https://img.shields.io/badge/documentation-user_guide-brightgreen.svg)](UserGuide.md)
-[![MIT Licence](https://img.shields.io/badge/license-MIT-yellowgreen.svg)](https://opensource.org/licenses/MIT/)
+[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 # Summary
 
 STEDY is a software package based on MATLAB to enable researchers to simulate dynamics of tensegrity structures. We have developed a Lagrangian formulation for deriving the algebraic differential equations governing the dynamics of classical tensegrity systems. The framework is general enough to allow modeling of general multi-body systems with actuated joints. Furthermore, with the help of the direct correction method that minimizes both geometric and energy constraint violations, errors that arise from numerical integration are corrected on the position and velocity levels, thereby improving simulation accuracy.
