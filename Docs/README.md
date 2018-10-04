@@ -57,7 +57,7 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
     function varargout = ode45m(ode,tspan,y0,options,varargin)
     ```
 
-6. To avoid having to run setup.m everytime you run MATLAB, please go to *Set Path* in the Home tab and add the corresponding location of *stedy/Main* to MATLAB's path.
+6. To avoid having to run setup.m everytime you run MATLAB, go to *Set Path* in the Home tab and add the corresponding location of *stedy/Main* to MATLAB's path.
 
 Follow *stedy*'s [User Guide] to get started.
 ### References
