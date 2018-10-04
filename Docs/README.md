@@ -6,6 +6,9 @@ STEDY is a software package based on MATLAB to enable researchers to simulate dy
 
 The software is aimed at researchers familiar with tensegrity structures, but can be adopted by users from other backgrounds as well. However, users are required to have a preliminary understanding of MATLAB's interface in order to make the best use of this package.
 
+## Dependencies
+* [MATLAB Optimization toolbox]
+
 ## Startup:
 1. Download the STEDY folder from Github.
 
@@ -66,3 +69,4 @@ Follow *stedy*'s [User Guide] to get started.
     Please contact the authors at addyhsu@tamu.edu or vaishnavtv@tamu.edu for a copy of the submitted paper.
 
 [User Guide]: (UserGuide.md)
+[MATLAB Optimization toolbox]: https://www.mathworks.com/products/optimization.html
