@@ -16,11 +16,10 @@ changes, improvements or alternatives may be given).
 
 ## Coding standards
 
-* Code must work in [MATLAB] (>= 2016a).
+* Code must work in [MATLAB] (>= 2017a).
 * MATLAB-style documentation and comments.
 * Encoding: UTF-8.
-* Line size limit: 75 chars.
-* Newlines: Unix style, i.e. LF or \n.
+* Newlines: Unix style, i.e. LF or sprintf('\n').
 
 ## Issues and support
 
