@@ -28,7 +28,7 @@ if(tData.nStr>0) % If strings present in structure
         end
         Forces = Forces - sig_k(i)*tData.Y{i}'*tData.Y{i}*q;
     end
-    tData.Cab_En = -kron(sig_k',eye(ns))*(cell2mat(tData.Y))'*q;
+    Cab_En = -kron(sig_k',eye(ns))*(cell2mat(tData.Y))'*q;
 
 end
 
