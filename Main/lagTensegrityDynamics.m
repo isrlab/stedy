@@ -62,7 +62,7 @@ else
 end
     
 if(tData.nStr>0) % If strings present in structure
-    F1 = [tData.Cab_En + tData.G + extF + Fd;hessR]; % No gravity
+    F1 = [Cab_En + tData.G + extF + Fd;hessR]; % No gravity
 else
     F1 = [tData.G+extF + Fd;hessR];
 end
