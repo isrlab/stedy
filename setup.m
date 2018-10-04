@@ -6,15 +6,15 @@
 
 addpath([pwd filesep 'Main']);
 
+srcLoc = [matlabroot filesep 'toolbox' filesep 'matlab' filesep 'funfun' filesep 'private'];
+odeLoc = [matlabroot filesep 'toolbox' filesep 'matlab' filesep 'funfun' filesep 'ode45.m'];
+
 cd Main
 check = exist('ODE_helperFiles');
 if(check == 0)
     mkdir ODE_helperFiles
     copyfile(strcat(srcLoc),'ODE_helperFiles');
 end
-
-srcLoc = [matlabroot filesep 'toolbox' filesep 'matlab' filesep 'funfun' filesep 'private'];
-odeLoc = [matlabroot filesep 'toolbox' filesep 'matlab' filesep 'funfun' filesep 'ode45.m'];
 
 copyfile(strcat(odeLoc),'ode45m.m');
 addpath([pwd filesep 'ODE_helperFiles']);
@@ -32,7 +32,7 @@ if(isempty(strLocODE))
     msg = 'Editing ode solver failed. Please edit ODE45m manually.';
     error(msg);
 else 
-    strCall = ['      ynew = ConstraintCorrection(ynew,odeArgs{1},tnew);' newline newline];
+    strCall = ['      ynew = ConstraintCorrection(ynew,odeArgs{1},tnew);' sprintf('\n') sprintf('\n')];
     str = insertBefore(str,endStr,strCall);
     
     % Change name
