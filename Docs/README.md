@@ -66,7 +66,7 @@ Follow *stedy*'s [User Guide] to get started.
 ### References
 1. Shao-Chen Hsu, Vaishnav Tadiparthi and Raktim Bhattacharya, "A Lagrangian Formulation for Constrained Multibody Dynamics in Tensegrity Systems", Manuscript submitted for publication.
 
-    Please contact the authors at addyhsu@tamu.edu, vaishnavtv@tamu.edu or raktim@tamu.edu for a copy of the submitted paper.
+    Please contact the authors at addyhsu@tamu.edu, vaishnavtv@tamu.edu, or raktim@tamu.edu for a copy of the submitted paper.
 
 [User Guide]: (UserGuide.md)
 [MATLAB Optimization toolbox]: https://www.mathworks.com/products/optimization.html
