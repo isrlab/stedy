@@ -9,9 +9,11 @@ tags:
 
 authors:
   - name: Vaishnav Tadiparthi
+    orcid: 0000-0001-9897-0600
     affiliation: 1
 
   - name: Shao-Chen Hsu
+    orcid: 0000-0002-9407-0119
     affiliation: 1
 
   - name: Raktim Bhattacharya
@@ -46,7 +48,7 @@ This work was supported by NSF IUSE/PFE: RED: REvolutionizing Diversity Of Engin
 # References
 1. Shao-Chen Hsu, Vaishnav Tadiparthi, and Raktim Bhattacharya, "A Lagrangian Formulation for Constrained Multibody Dynamics in Tensegrity Systems", Manuscript submitted for publication.
 
-    Please contact the authors at addyhsu@tamu.edu or vaishnavtv@tamu.edu for a copy of the submitted paper.
+    Please contact the authors at addyhsu@tamu.edu, vaishnavtv@tamu.edu, or raktim@tamu.edu for a copy of the submitted paper.
 
 [space habitats]: https://www.nasa.gov/feature/tensegrity-approaches-to-in-space-construction-of-a-1g-growable-habitat
 
