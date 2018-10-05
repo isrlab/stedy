@@ -17,6 +17,7 @@ authors:
     affiliation: 1
 
   - name: Raktim Bhattacharya
+    orcid: 0000-0002-8218-2631
     affiliation: 2
 affiliations:
  - name: Graduate Research Assistant, Texas A&M University
