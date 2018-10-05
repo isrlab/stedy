@@ -68,5 +68,5 @@ Follow *stedy*'s [User Guide] to get started.
 
     Please contact the authors at addyhsu@tamu.edu, vaishnavtv@tamu.edu, or raktim@tamu.edu for a copy of the submitted paper.
 
-[User Guide]: (UserGuide.md)
+[User Guide]: UserGuide.md
 [MATLAB Optimization toolbox]: https://www.mathworks.com/products/optimization.html
