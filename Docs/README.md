@@ -1,3 +1,4 @@
+[![Latest release](https://img.shields.io/github/release/uqLab/stedy.svg)](https://github.com/uqLab/stedy/releases)
 [![Documentation](https://img.shields.io/badge/documentation-user_guide-brightgreen.svg)](UserGuide.md)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 # Summary
