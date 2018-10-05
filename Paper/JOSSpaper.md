@@ -35,15 +35,19 @@ The dynamics of tensegrity systems is governed by multi-body dynamics, given by 
 
 `STEDY` is a MATLAB package for conducting numerically accurate tensegrity dynamics. The scientific computing community's familiarity with MATLAB makes it a favored choice for performing simulations of this nature. The equations of motion are developed in Cartesian coordinates. Although the choice of non-minimum coordinates is fairly controversial in the robotics community on account of a reduction in the system's configuration space in the presence of joints, adopting Cartesian coordinates precludes any singularities developed in the mass matrix and facilitates derivations of elegant differential-algebraic equations governing the multi-body dynamics. However, usage of non-minimum coordinates is likely to result in the solution drifting away from the constraint space because of integration errors. The software package includes an implementation of the direct correction scheme that minimizes numerically induced constraint violations and energy conservation errors. We have demonstrated superiority of the method in terms of accuracy over the commercially available dynamics simulator, Simscape Multibody.
 
-`STEDY` was designed to be used by researchers looking to simulate tensegrity dynamics without having to derive the differential equations for any structure in particular. The inputs that are required from the user are simply the parameters that uniquely define the tensegrity structure (initial nodal configuration, connectivity), the material and geometric properties, and simulation environment properties (inertially fixed nodes, external forces, duration, ODE solver options).
+`STEDY` was designed to be used by researchers looking to simulate tensegrity dynamics without having to derive the differential equations for any structure in particular. The inputs that are required from the user are simply the parameters that uniquely define the tensegrity structure (initial nodal configuration, connectivity), the material and geometric properties, and simulation environment properties (inertially fixed nodes, external forces, duration, ODE solver options). Currently, `STEDY` is being used by TAMU researchers to develop [space habitats] and [wind turbine blades] using tensegrity principles.
 
-The software documentation and the paper cited below (contact us for a copy) comprehensively cover the functionality and the theory behind the Lagrangian formulation and the novel constraint correction method implemented in the package. We shall seek to incorporate techniques introducing control of dynamic tensegrity systems in future versions of the software. 
+The software documentation and the paper cited below (contact us for a copy) comprehensively cover the functionality and the theory behind the Lagrangian formulation and the novel constraint correction method implemented in the package. We shall seek to incorporate techniques introducing control of dynamic tensegrity systems in future versions of the software.
 
 # Acknowledgements
 
 This work was supported by NSF IUSE/PFE: RED: REvolutionizing Diversity Of Engineering (REDO-E)Award Number:1730693; and NASA NIAC Phase II grant, on Tensegrity Approaches to In-Space Construction of a 1g Growable Habitat.
 
 # References
-1. Shao-Chen Hsu, Vaishnav Tadiparthi and Raktim Bhattacharya, "A Lagrangian Formulation for Constrained Multibody Dynamics in Tensegrity Systems", Manuscript submitted for publication.
+1. Shao-Chen Hsu, Vaishnav Tadiparthi, and Raktim Bhattacharya, "A Lagrangian Formulation for Constrained Multibody Dynamics in Tensegrity Systems", Manuscript submitted for publication.
 
     Please contact the authors at addyhsu@tamu.edu or vaishnavtv@tamu.edu for a copy of the submitted paper.
+
+[space habitats]: https://www.nasa.gov/feature/tensegrity-approaches-to-in-space-construction-of-a-1g-growable-habitat
+
+[wind turbine blades]:https://www.nsf.gov/awardsearch/showAward?AWD_ID=1762825&HistoricalAwards=false
