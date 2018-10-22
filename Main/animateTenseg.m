@@ -25,8 +25,18 @@ function animateTenseg(t,y,tData,time_loc,filename,format,frameRate,AZ,EL,axLims
 % 
 % axLims: axis limits in animated figure
 % 
+if ismac
+    vidObj = VideoWriter(filename,format);
+elseif isunix
+    sprintf('MPEG-4 is not a valid profile on Linux systems.');
+    format = 'Motion JPEG AVI';
+    filename = strcat(filename,'.avi');
+    vidObj = VideoWriter(filename,format);
+else
+    vidObj = VideoWriter(filename,format);
+end
 
-vidObj = VideoWriter(filename,format);
+
 vidObj.FrameRate = frameRate;
 open(vidObj);
 

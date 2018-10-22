@@ -1,4 +1,4 @@
-function [t,y] = tensegSim(x0,tEnd,tData,options)
+function [t,y] = tensegSim(x0,simTime,tData,options)
 % /* This Source Code Form is subject to the terms of the Mozilla Public
 % * License, v. 2.0. If a copy of the MPL was not distributed with this
 % * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
@@ -29,14 +29,6 @@ function [t,y] = tensegSim(x0,tEnd,tData,options)
 
 
 nn = numel(tData.N);
-
-if (options.Refine)
-    simTime = [0 tEnd];
-else
-    prompt = 'Enter output time-step: ';
-    tInt = input(prompt);
-    simTime = 0:tInt:tEnd;
-end
 
 tData.Energy = 0.5*x0(nn+1:end-1)'*tData.M*x0(nn+1:end-1)-tData.G'*x0(1:nn)+tData.Vs; % Total energy in structure
 if(tData.Correction ~= 2) % Constraint Correction turned on
