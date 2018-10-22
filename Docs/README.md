@@ -21,6 +21,7 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
 2. Open MATLAB and make STEDY your working directory.
 
 3. Run setup.m.
+
       In case an error message is displayed after Step 3, follow the instructions below before Step 4:
       ```MATLAB
       Editing ode solver failed. Please edit ODE45m manually.
