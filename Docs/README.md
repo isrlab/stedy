@@ -27,6 +27,7 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
       ```
       *3b*. You will find a copy of *ode45* in your main folder called *ode45m*. Edit it to add the following line exactly in the position shown below. To clarify, in the context of ode45, constraint correction has been implemented only after ensuring that the weighted error (obtained after advancing one step) is no more than the tolerance *rtol*.
           **NOTE**: The user is required to add **ONLY** the line calling the ConstraintCorrection function to ode45m.
+
           ```matlab
           % Accept the solution only if the weighted error is no more than the
           % tolerance rtol.  Estimate an h that will yield an error of rtol on
@@ -60,11 +61,11 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
             ...
           end
           ```
-*3c*. After editing, rename the function at the top to ode45m to avoid a warning.
-      ```matlab
-      function varargout = ode45m(ode,tspan,y0,options,varargin)
-      ```
-      
+    *3c*. After editing, rename the function at the top to ode45m to avoid a warning.
+          ```matlab
+          function varargout = ode45m(ode,tspan,y0,options,varargin)
+          ```
+
 4. To avoid having to run setup.m everytime you run MATLAB, go to *Set Path* in the Home tab and add the corresponding location of *stedy/Main* to MATLAB's path.
 
 
