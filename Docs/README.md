@@ -63,6 +63,7 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
           end
           ```
     *3c*. After editing, rename the function at the top to ode45m to avoid a warning.
+    
           ```matlab
           function varargout = ode45m(ode,tspan,y0,options,varargin)
           ```
