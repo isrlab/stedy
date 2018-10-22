@@ -116,7 +116,9 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10);
 
 tEnd = 10; % Simulation End Time
 
-[t,y] = tensegSim(x0,tEnd,tData,options);
+[simTime,tInt] = tensegSimTime(options,tEnd);
+
+[t,y] = tensegSim(x0,simTime,tData,options);
 
 %% Plotting 
 
@@ -142,9 +144,11 @@ plotConstr(t,y,tData);
 
 %% Animation
 % AZ, EL and axLims shall be the same as used in plot_configuration
-frameRate = 1/0.05; % Video Framerate
+filename = 'DBar_Animation';
+formatSpec = 'MPEG-4';
+frameRate = 1/tInt; % Video Framerate
 time_loc = [0 0 4]; % Location of displayed time, can be chosen differently by the user
-animateTenseg(t,y,tData,time_loc,'DBar_Animation.mp4','MPEG-4',frameRate,AZ, EL,axLims);
+animateTenseg(t,y,tData,time_loc,filename,formatSpec,frameRate,AZ, EL,axLims);
 % The user is encouraged to look further at MATLAB documentation on
 % VideoWriter to see what video formats are allowed. 
 

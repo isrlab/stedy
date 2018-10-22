@@ -61,7 +61,9 @@ x0 = [x0;0]; % Initial Condition - [Position; Velocity; Energy];
 
 options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
 
-[t,y] = tensegSim(x0,tEnd,tData,options);
+[simTime,tInt] = tensegSimTime(options,tEnd);
+
+[t,y] = tensegSim(x0,simTime,tData,options);
 
 %% Plotting 
 
@@ -79,6 +81,8 @@ plotMotion(t,y,tData);
 plotConstr(t,y,tData);
 
 % Animation
-frameRate = 1/0.05;
+filename = 'TBar_Animation';
+formatSpec = 'MPEG-4';
+frameRate = 1/tInt;
 time_loc = [0.5 0 5];
-animateTenseg(t,y,tData,time_loc,'TBar_Animation.mp4','mpeg-4',frameRate,AZ,EL,axLims);
+animateTenseg(t,y,tData,time_loc,filename,formatSpec,frameRate,AZ,EL,axLims);

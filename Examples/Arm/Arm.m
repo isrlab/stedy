@@ -133,6 +133,8 @@ x0 = [x0;0]; % Initial Condition - [Position; Velocity; Work];
 
 options = odeset('RelTol',1e-10,'AbsTol',1e-10); % ODE options
 
+[simTime,tInt] = tensegSimTime(options,tEnd);
+
 [t,y] = tensegSim(x0,tEnd,tData,options);
 
 %% Plotting
@@ -151,7 +153,9 @@ plotMotion(t,y,tData);
 plotConstr(t,y,tData);
 
 % Animation
-frameRate = 1/0.05;
+filename = 'Arm_Animation';
+formatSpec = 'MPEG-4';
+frameRate = 1/tInt;
 time_loc = [1 0 2.5];
-animateTenseg(t,y,tData,time_loc,'Arm_Animation.mp4','MPEG-4',frameRate,AZ,EL,axLims);
+animateTenseg(t,y,tData,time_loc,filename,formatSpec,frameRate,AZ,EL,axLims);
 
