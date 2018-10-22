@@ -10,58 +10,62 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
 ## Dependencies
 * [MATLAB Optimization toolbox]
 
-## Startup:
+## Documents
+* [User Guide]
+* [Contributing Guidelines]
+* [Code of Conduct]
+
+## Installation:
 1. Download the STEDY folder from Github.
 
 2. Open MATLAB and make STEDY your working directory.
 
 3. Run setup.m.
+      In case an error message is displayed after Step 3, follow the instructions below before Step 4:
+      ```MATLAB
+      Editing ode solver failed. Please edit ODE45m manually.
+      ```
+      *3b*. You will find a copy of *ode45* in your main folder called *ode45m*. Edit it to add the following line exactly in the position shown below. To clarify, in the context of ode45, constraint correction has been implemented only after ensuring that the weighted error (obtained after advancing one step) is no more than the tolerance *rtol*.
+          **NOTE**: The user is required to add **ONLY** the line calling the ConstraintCorrection function to ode45m.
+          ```matlab
+          % Accept the solution only if the weighted error is no more than the
+          % tolerance rtol.  Estimate an h that will yield an error of rtol on
+          % the next step or the next try at taking this step, as the case may be,
+          % and use 0.8 of this value to avoid failures.
 
-4. In case an error message is displayed, follow the instructions below:
-    ```MATLAB
-    Editing ode solver failed. Please edit ODE45m manually.
-    ```
-    You will find a copy of *ode45* in your main folder called *ode45m*. Edit it to add the following line exactly in the position shown below. To clarify, in the context of ode45, constraint correction has been implemented only after ensuring that the weighted error (obtained after advancing one step) is no more than the tolerance *rtol*.
-    **NOTE**: The user is required to add **ONLY** the line calling the ConstraintCorrection function to ode45m.
-    ```matlab
-    % Accept the solution only if the weighted error is no more than the
-    % tolerance rtol.  Estimate an h that will yield an error of rtol on
-    % the next step or the next try at taking this step, as the case may be,
-    % and use 0.8 of this value to avoid failures.
+          if err > rtol % Failed step
+            ...
 
-    if err > rtol % Failed step
-      ...
+                if nofailed
+                  nofailed = false;
+                  if NNrejectStep
+                    absh = max(hmin, 0.5*absh);
+                  else
+                    absh = max(hmin, absh * max(0.1, 0.8*(rtol/err)^pow));
+                  end
+                else
+                  absh = max(hmin, 0.5 * absh);
+                end
+                h = tdir * absh;
+                done = false;
 
-          if nofailed
-            nofailed = false;
-            if NNrejectStep
-              absh = max(hmin, 0.5*absh);
-            else
-              absh = max(hmin, absh * max(0.1, 0.8*(rtol/err)^pow));
-            end
-          else
-            absh = max(hmin, 0.5 * absh);
+          else  % (Successful step)
+
+              % ADD ONLY THE FOLLOWING LINE CALLING THE FUNCTION
+              ynew = ConstraintCorrection(ynew,odeArgs{1},tnew);
+
+                NNreset_f7 = false;
+                if nonNegative && any(ynew(idxNonNegative)<0)
+
+            ...
           end
-          h = tdir * absh;
-          done = false;
+          ```
+*3c*. After editing, rename the function at the top to ode45m to avoid a warning.
+      ```matlab
+      function varargout = ode45m(ode,tspan,y0,options,varargin)
+      ```
+4. To avoid having to run setup.m everytime you run MATLAB, go to *Set Path* in the Home tab and add the corresponding location of *stedy/Main* to MATLAB's path.
 
-    else  % (Successful step)
-
-        % ADD ONLY THE FOLLOWING LINE CALLING THE FUNCTION
-        ynew = ConstraintCorrection(ynew,odeArgs{1},tnew);
-
-          NNreset_f7 = false;
-          if nonNegative && any(ynew(idxNonNegative)<0)
-
-      ...
-    end
-    ```
-5. After editing, rename the function at the top to ode45m to avoid a warning.
-    ```matlab
-    function varargout = ode45m(ode,tspan,y0,options,varargin)
-    ```
-
-6. To avoid having to run setup.m everytime you run MATLAB, go to *Set Path* in the Home tab and add the corresponding location of *stedy/Main* to MATLAB's path.
 
 Follow *stedy*'s [User Guide] to get started.
 ### References
@@ -71,3 +75,5 @@ Follow *stedy*'s [User Guide] to get started.
 
 [User Guide]: UserGuide.md
 [MATLAB Optimization toolbox]: https://www.mathworks.com/products/optimization.html
+[Contributing Guidelines]: ContributingGuidelines.md
+[Code of Conduct]: CodeofConduct.md

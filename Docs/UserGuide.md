@@ -36,8 +36,8 @@ The dynamics of tensegrity systems is governed by multi-body dynamics, given by 
 A common example of a tensegrity system is that of a D-Bar.
 ![DBar_Configuration](Figs/DBar.jpg)
 
-A DBar is a tensegrity system of 4 bars (in black) and 2 strings (in red) connected as shown above. The initial nodal configuration, the connectivity matrices, the material and geometric properties as well as the simulation environment properties are described below in further detail.  
-The user is recommended to go through TemplateForUser_DBar.m in the examples folder to view the entire source file for the following inputs.
+A DBar is a tensegrity system of 4 bars (in black) and 2 strings (in red) connected as shown above. The initial nodal configuration, the connectivity matrices, the material and geometric properties as well as the simulation environment properties are described below in further detail.
+The user is recommended to go through Template_DBar.m in the examples folder to view the entire source file for the following inputs.
 
 ## Inputs Required from the User:
 All parameters are to be declared in SI units.
@@ -52,8 +52,8 @@ All parameters are to be declared in SI units.
     %      N1y N2y N3y ..;
     %      N1z N2z N3z ..;];
     ```
-2. **C**: A matrix of size *(m x nNodes)* <!--![equation](https://latex.codecogs.com/gif.latex?\in&space;\mathbb{R}^{m&space;\times&space;n})--><!--($\in \mathbb{R}^{m \times n}$)--> defines the connectivity matrix describing the network locations of *m* <!--![equation](https://latex.codecogs.com/gif.latex?m)--><!-- $m$ --> bars and strings.  
-Specifically, if the kth <!--![equation](https://latex.codecogs.com/gif.latex?k^{th})--><!--$k^{th}$--> member is defined by connecting nodes *n(i)* <!--![equation](https://latex.codecogs.com/gif.latex?n_i)--><!--$n_i$--> and *n(j)*, <!--![equation](https://latex.codecogs.com/gif.latex?n_j)--><!--$n_j$-->   
+2. **C**: A matrix of size *(m x nNodes)* <!--![equation](https://latex.codecogs.com/gif.latex?\in&space;\mathbb{R}^{m&space;\times&space;n})--><!--($\in \mathbb{R}^{m \times n}$)--> defines the connectivity matrix describing the network locations of *m* <!--![equation](https://latex.codecogs.com/gif.latex?m)--><!-- $m$ --> bars and strings.
+Specifically, if the kth <!--![equation](https://latex.codecogs.com/gif.latex?k^{th})--><!--$k^{th}$--> member is defined by connecting nodes *n(i)* <!--![equation](https://latex.codecogs.com/gif.latex?n_i)--><!--$n_i$--> and *n(j)*, <!--![equation](https://latex.codecogs.com/gif.latex?n_j)--><!--$n_j$-->
  *C(k,i) = -1, C(k,j) = 1*. All other elements in the kth row should be zero.
 
     There are two ways the user can characterize these matrices:
@@ -111,7 +111,7 @@ Strings are modeled as springs but unlike springs, they can only exert tensile f
       strings.r = [0.01 0.05 0.01 0.05];
       ```
 
-      Rest length here is in percentage,i.e., 0.7 implies 70%. The rest lengths of the strings are 70% of the current length of the strings.  
+      Rest length here is in percentage,i.e., 0.7 implies 70%. The rest lengths of the strings are 70% of the current length of the strings.
       **NOTE**: The rest lengths of the strings are a measure of the pre-stress in the structure. The lower the rest lengths, the more pre-stressed a structure is.
 5. **bars**: MATLAB structure containing fields to define material properties of the bars present in the tensegrity structure.
 Bars are modeled as cylinders with a specified density and radius.
@@ -159,7 +159,7 @@ Bars are modeled as cylinders with a specified density and radius.
     ```
     **NOTE**: In this example, the *'Refine'* option lets the solver choose the output interval times automatically. If the user wishes to define output interval times themselves, they should ignore defining this attribute and assign a value when prompted.
     ```matlab
-    Enter output time-step:
+    Enter output time-step (e.g. 0.01):
     ```
 
 13. **AZ** and **EL**: Input for the functions plot_configuration and animateTenseg. Represents the azimuth and the elevation angle in degrees, used to specify the viewpoint during plotting. The user is advised to look at MATLAB's [viewpoint] documentation on how to provide these inputs.
@@ -172,12 +172,20 @@ Bars are modeled as cylinders with a specified density and radius.
     ```matlab
     axLims = [-5 5 -3 3 -5 5];
     ```
+15. **filename**: String input for the name of the file to which the animation video will be saved.
+```matlab
+filename = 'DBar_Animation';
+```
+16. **formatSpec**: String input to specify video format of the animation.
+    ```matlab
+    formatSpec = 'MPEG-4';
+    ```
 
-15. **frameRate**: Input for the function animateTenseg. Defines the rate of video playback in frames per second, specified as a positive number. Ideally chosen to be 1/(tInt) where tInt is the output interval time step chosen by the user. Note that if the Refine field is turned on in ode options, tInt is chosen by the integrator and is not up to the user. In that case, the user can choose any frame rate suitable to his animation output needs.
+17. **frameRate**: Input for the function animateTenseg. Defines the rate of video playback in frames per second, specified as a positive number. Ideally chosen to be 1/(tInt) where tInt is the output interval time step chosen by the user. Note that if the Refine field is turned on in ode options, tInt is chosen by the integrator and is not up to the user. In that case, the user can choose any frame rate suitable to his animation output needs.
     ```matlab
     frameRate = 1/0.05;
     ```
-16. **time_loc**: Like frameRate, this is an input for animateTenseg. This is a vector describing the location of the displayed time text in the figure window during animation.
+18. **time_loc**: Like frameRate, this is an input for animateTenseg. This is a vector describing the location of the displayed time text in the figure window during animation.
     ```matlab
     time_loc = [0 0 4]; % Can be chosen arbitrarily
     ```
