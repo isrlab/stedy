@@ -114,7 +114,7 @@ tData.minforce = 10; % Lower bound for force densities in the strings
 tData = tensegEq(x0,N(:),tData);
 
 %% Final Simulation
-tEnd = 5; % Simulation End Time
+tEnd = 1; % Simulation End Time
 
 options = odeset('RelTol',1e-10,'AbsTol',1e-10); % ODE options
 
