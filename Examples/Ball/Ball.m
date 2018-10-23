@@ -122,7 +122,7 @@ x0 = [x0;0]; % Initial Condition - [Position; Velocity; Work];
 
 [simTime,tInt] = tensegSimTime(options,tEnd);
 
-[t,y] = tensegSim(x0,tEnd,tData,options);
+[t,y] = tensegSim(x0,simTime,tData,options);
 
 %% Plotting
 

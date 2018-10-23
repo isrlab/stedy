@@ -135,7 +135,7 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10); % ODE options
 
 [simTime,tInt] = tensegSimTime(options,tEnd);
 
-[t,y] = tensegSim(x0,tEnd,tData,options);
+[t,y] = tensegSim(x0,simTime,tData,options);
 
 %% Plotting
 
