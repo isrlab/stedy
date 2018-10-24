@@ -50,7 +50,7 @@ tData = tensegGenMat(tData,bars,strings,Mp,g);
 % is no need to call the function tensegEq.
 
 %% Simulation Inputs
-tData.F = 0; % If 1, external force present in structure, else no external forces.
+tData.F = 0; % If 1, external forces are present in structure, not if 0.
 tData.Correction = 1; % If 1, constraint correction inclusive of total energy constraint If 0, only linear and bar length constraint violations corrected. 
 tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
 

@@ -3,12 +3,12 @@
 % * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 
 % This file demostrates an exmaple of a ball-shaped tensegrity strucute,
-% which formulated by 6 bars, 32 strings and 1 point mass at the geometric 
+% which is formulated by 6 bars, 32 strings and 1 point mass at the geometric 
 % center of the structure.
 %
 % We first generate associated parameters that are stored in tData, and we
 % calculate an equilibrium force that is used in the simulation. An
-% external force, which defined in 'ext_F.m', is applied to the structure.
+% external force, defined in 'ext_F.m', is applied to the structure.
 % Plots and animation are made after the simulation.
 
 clc; clear; 
@@ -16,7 +16,7 @@ clc; clear;
 %% Node generation
 % First, we need to have the coordinates of a regular icosahedron, which is
 % formulated from the golden ratio, and the coordinates are described by
-% (0,+-1,+-phi), where phi is the golden ratio. The payload is then be
+% (0,+-1,+-phi), where phi is the golden ratio. The payload is then at the
 % origin.  In addition, we would like to have 3 nodes (node 1,2,9) laying
 % on x-y plane. To do this, we move the origin to node 1 and rotate the
 % body around node 1 in angle alpha such that 3 nodes are on the plane.
@@ -102,7 +102,7 @@ g = [0;0;-9.806]; % Gravity
 tData = tensegGenMat(tData,bars,strings,Mp,g);
 
 %% Simulation Inputs
-tData.F = 1; % If 1, external force present in structure, else no external forces.
+tData.F = 1; % If 1, external forces are present in structure, not if 0.
 tData.Correction = 1; % If 1, constraint correction inclusive of total energy constraint If 0, only linear and bar length constraint violations corrected. 
 % tData.damper = 0.1*ones(1,tData.nStr);
 % Dampers are not being used on strings in this example. 

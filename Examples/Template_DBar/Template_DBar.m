@@ -85,7 +85,7 @@ tData = tensegGenMat(tData,bars,strings,Mp,g);
 
 %% Simulation Inputs
 tData.F = 0; 
-% If 1, external force present in structure, else no external forces.
+% If 1, external force present in structure, not if 0.
 
 tData.Correction = 1; 
 % If 1, constraint correction inclusive of total energy constraint.
@@ -116,7 +116,9 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10);
 
 tEnd = 10; % Simulation End Time
 
-[simTime,tInt] = tensegSimTime(options,tEnd);
+[simTime,tInt] = tensegSimTime(options,tEnd); 
+% Functio to create simTime and output interval time for simulation,
+% on the basis of ODE options. 
 
 [t,y] = tensegSim(x0,simTime,tData,options);
 

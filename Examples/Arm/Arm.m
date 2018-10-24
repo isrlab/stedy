@@ -7,7 +7,7 @@
 %
 % We first generate associated parameters that are stored in tData, and we
 % calculate an equilibrium force that is used in the simulation. An
-% external force, which defined in 'ext_F.m', is applied to the structure.
+% external force, defined in 'ext_F.m', is applied to the structure.
 % Plots and animation are made after the simulation.
 
 clc; clear;
@@ -34,9 +34,6 @@ N = [0 0 0;
      0 0 vz;]';
 
 nNodes = size(N,2); % Number of Nodes
-nn = numel(N); % number of elements in N - 3*number of nodes: Probably not required
-
-
 
 fixedNodes = [1 1 1;1 1 1; zeros(13,3);1 1 1]'; % To identify which coordinates of a node are fixed: 1-fixed, 0-unfixed
                                                 % Same size as N
@@ -115,7 +112,7 @@ g = [0;0;-9.806]; % Gravity
 tData = tensegGenMat(tData,bars,strings,Mp,g);
 
 %% Simulation Inputs
-tData.F = 1; % If 1, external force present in structure, else no external forces.
+tData.F = 1; % If 1, external forces are present in structure, not if 0.
 tData.Correction = 1; % If 1, constraint correction inclusive of total energy constraint If 0, only linear and bar length constraint violations corrected. 
 % tData.damper = 0.2*ones(1,tData.nStr);
 % Dampers are not being used on strings in this example. 
