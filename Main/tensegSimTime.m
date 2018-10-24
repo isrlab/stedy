@@ -8,7 +8,7 @@ function [simTime, tInt] = tensegSimTime(options,tEnd)
 % 
 % INPUTS: 
 % options: ODE45 options. The user is encouraged to look at MATLAB's ode45
-% documentation to understand how to provide this input.
+% documentation to understand how to provide this input structure.
 % 
 % tEnd: Simulation end time
 % 
@@ -16,9 +16,9 @@ function [simTime, tInt] = tensegSimTime(options,tEnd)
 % tInt: Output interval time-step
 % 
 % simTime: Simulation time, to be provided as input to tensegSim. If Refine
-% option is turned on, simTime is just [0 tSpan], otherwise the function
+% option is turned on, simTime = [0 tSpan], otherwise the function
 % prompts the user to enter output interval time-step and simTime shall form a
-% vector [0:tInt:tEnd]
+% vector [0:tInt:tEnd].
 % 
 if (options.Refine)
     simTime = [0 tEnd];
