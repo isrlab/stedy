@@ -77,7 +77,7 @@ X = lb*sin(q(:,1)); Z = -lb*cos(q(:,1));
 
 %% Comparing Results
 
-% Plotting Comparison
+% Plotting Comparison with Minimum Realization
 figure(1); clf;
 
 subplot(2,1,1);
@@ -90,10 +90,12 @@ plot(t,Z - y(:,6)); hold on;
 xlabel('Time (s)'); ylabel('z(t)'); 
 set(gca,'box','off');
 
+% Test Constraint Violations
+testConstraint(t,y,tData);
 %% Display Results
-if(norm(X-y(:,4)) && norm(Z-y(:,6)) < 1e-4)
-    fprintf('Test case successful.');
+if(norm(X-y(:,4)) && norm(Z-y(:,6)) < 1e-6)
+    fprintf('Motion Error under 1e-6.\n');
 else
-    fprintf('Test case failed.');
+    fprintf('Motion Error over 1e-6. Test failed.\n');
 end
 
