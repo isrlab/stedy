@@ -26,9 +26,16 @@ changes, improvements or alternatives may be given).
 Problems with this software can be reported in the [issues section](https://github.com/uqLab/stedy/issues).
 Support for *stedy* is provided on best effort basis by emailing the author at vaishnavtv@tamu.edu.
 
+## Test Case
+A simple test case ([*TestPendulum.m*]) has been provided in the [Tests] folder of the repository for the user to test their version of the code. The results of the test case will be displayed on the command window.
+
+Please note that the main contributions of the software comprise an efficient Lagrangian formulation of the dynamics and the constraint correction method implemented as part of the ODE45 solver. Improvements to plotting functions cannot be checked by running this test case.
+
 #### Note
 
 This document is partially adapted from the [TempoSimple](https://github.com/gnugat-legacy/tempo-simple/blob/master/CONTRIBUTING.md)
 contributing guidelines.
 
 [MATLAB]: http://www.mathworks.com/products/matlab/
+[Tests]: https://github.com/uqLab/stedy/tree/master/Tests
+[*TestPendulum.m*]: https://github.com/uqLab/stedy/blob/master/Tests/TestPendulum.m
