@@ -62,9 +62,6 @@ TH = eye(tData.nBar); % Theta matrix of bars
 PSI = eye(tData.nStr); % Psi matrix of strings
 PHI = eye(tData.nPm); % Phi matrix of point masses
 
-B = tData.N*tData.Cb'; % Bars
-S = tData.N*tData.Cs'; % Strings
-P = tData.N*tData.Lpm'; % Point masses
 
 M = zeros(3*tData.nNodes,3*tData.nNodes);
 G = zeros(3*tData.nNodes,1);
@@ -77,24 +74,28 @@ bb = tData.N(:);
 Lin.b = bb(ii);
 
 % Bars
-for k=1:tData.nBar
-    thk = TH(:,k); 
-    Xk = kron(thk'*tData.Cb,eye(3));
-    Xkbar = 0.5*kron(thk'*abs(tData.Cb),eye(3));
-    b = B(:,k);
-    L = norm(b);
-    mk = bars.rho(k)*(pi*bars.r(k)^2)*L;
-    Ik = (mk/12)*(L^2); 
-    M = M + mk*Xkbar'*Xkbar + (Ik/L^2)*Xk'*Xk;
-    G = G + mk*Xkbar'*tData.g; 
-    NLin(k).Mat = Xk'*Xk; % Nonlinear constraints pertaining to bar lengths
-    bars.L0(k,1) = L; % Initial lengths of bars
-    tData.listX{k} = Xk;
-    tData.listXbar{k} = Xkbar;
+if(tData.nBar > 0)
+    B = tData.N*tData.Cb'; % Bars
+    for k=1:tData.nBar
+        thk = TH(:,k); 
+        Xk = kron(thk'*tData.Cb,eye(3));
+        Xkbar = 0.5*kron(thk'*abs(tData.Cb),eye(3));
+        b = B(:,k);
+        L = norm(b);
+        mk = bars.rho(k)*(pi*bars.r(k)^2)*L;
+        Ik = (mk/12)*(L^2); 
+        M = M + mk*Xkbar'*Xkbar + (Ik/L^2)*Xk'*Xk;
+        G = G + mk*Xkbar'*tData.g; 
+        NLin(k).Mat = Xk'*Xk; % Nonlinear constraints pertaining to bar lengths
+        bars.L0(k,1) = L; % Initial lengths of bars
+        tData.listX{k} = Xk;
+        tData.listXbar{k} = Xkbar;
+    end
 end
 
 % Point Masses
 if(tData.nPm>0) 
+    P = tData.N*tData.Lpm'; % Point masses
     for k=1:tData.nPm
         phiK = PHI(:,k);
         Pk = kron((phiK'*tData.Lpm),eye(3));
@@ -114,6 +115,7 @@ tData.Lin = Lin; % Linear constraints
 % Strings
 Vs = 0; % Potential energy stored in strings
 if(tData.nStr>0)
+    S = tData.N*tData.Cs'; % Strings
     for k=1:tData.nStr
         psiK = PSI(:,k);
         Yk = kron((psiK'*tData.Cs),eye(3));
