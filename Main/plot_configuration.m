@@ -57,7 +57,11 @@ figure(figOptions);hold on;
             plot3(NN(1,k),NN(2,k),NN(3,k),'ko','MarkerFaceColor','k')
         end
     end
-    
+
+%     for i=1:tData.nNodes
+%         txt{i} = num2str(i);
+%         text(tData.N(1,i),tData.N(2,i),tData.N(3,i),txt{i},'fontsize',30);
+%     end
     axis equal;
     axis off;
     view(AZ,EL);

@@ -2,7 +2,7 @@ function animateTenseg(t,y,tData,time_loc,filename,format,frameRate,AZ,EL,axLims
 % /* This Source Code Form is subject to the terms of the Mozilla Public
 % * License, v. 2.0. If a copy of the MPL was not distributed with this
 % * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
-
+% 
 % Function to animate the simulated dynamics of the tensegrity structure
 %
 % INPUTS: [t, y, tData, time_loc, filename, format, frameRate, AZ, EL, AX]
@@ -36,6 +36,8 @@ else
     vidObj = VideoWriter(filename,format);
 end
 
+f = warndlg('Please do not disturb the animation window until simulation is complete.');
+uiwait(f);
 
 vidObj.FrameRate = frameRate;
 open(vidObj);

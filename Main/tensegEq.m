@@ -2,8 +2,9 @@ function tData = tensegEq(x0,x,tData)
 % /* This Source Code Form is subject to the terms of the Mozilla Public
 % * License, v. 2.0. If a copy of the MPL was not distributed with this
 % * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
-
-% Function to find the equilibrium force densities in the strings at t=0. 
+% 
+% Function to find the equilibrium force densities in the strings at t=0, 
+% given initial position and minimum force densities in the strings.  
 % 
 % INPUTS: [x0, x, tData]
 % 

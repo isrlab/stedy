@@ -4,7 +4,20 @@ function xdot = lagTensegrityDynamics(t,x,tData)
 % file, You can obtain one at http://mozilla.org/MPL/2.0/.
 % 
 % Main ODE function generating the algebraic differential equations to be
-% solved using ODE45 and the novel constraint correction method. 
+% solved using ODE45 and the novel constraint correction method.
+% 
+% The final linear equation is of the form: M*xSol = F1.
+% The matrix M and the vector F1 are generated from the corresponding
+% constraint equations and terms obtained from the Lagrange formulation
+% described in the manuscript. 
+% 
+% INPUTS: [t, x, tData]
+% 
+% x: Solution vector at time t
+% x has the form: [Nodal positions; Nodal velocities; Work]
+% 
+% tData: MATLAB structure containing all fields requisite and pertinent to
+% the dynamics simulation.
 % 
 
 ns = (numel(x)-1)/2; % No. of position/velocity variables
@@ -28,7 +41,7 @@ if(tData.nStr>0) % If strings present in structure
         end
         Forces = Forces - sig_k(i)*tData.Y{i}'*tData.Y{i}*q;
     end
-    Cab_En = -kron(sig_k',eye(ns))*(cell2mat(tData.Y))'*q;
+    Cab_En = -kron(sig_k',eye(ns))*(cell2mat(tData.Y))'*q; % Cable Energies
 
 end
 
