@@ -32,6 +32,8 @@ A tensegrity system is an arrangement of axially-loaded elements (no element ben
 
 The dynamics of tensegrity systems is governed by multi-body dynamics, given by a set of ordinary differential equations. We have developed a Lagrangian formulation based on Cartesian coordinates for deriving DAEs of the governing equations of motion in a tensegrity framework for both rigid and elastic bars. A novel technique for improving the accuracy of the simulation has also been implemented to ensure that the errors in states arising from numerical integration are corrected on the position and velocity levels according to both geometric and energy constraints.
 
+**NOTE**: The software cannot currently handle structures with internally rigid  bar groups, i.e., groups of bars that don't move relative to each other but move freely in the global frame.
+
 ## Example:
 A common example of a tensegrity system is that of a D-Bar.
 ![DBar_Configuration](Figs/DBar.jpg)
@@ -130,7 +132,7 @@ Bars are modeled as cylinders with a specified density and radius.
       ```matlab
       g = [0;0;-9.806];
       ```
-      The user can choose to avoid having gravity in his simulation environment by making it a vector of zeros. Generally, we assume the gravity vector to be in the negative z direction.
+      The user can choose to avoid having gravity in his simulation environment by making it a vector of zeros. Generally, we assume the gravity vector to be in the negative z direction, but STEDY is agnostic to the orientation chosen for the gravity vector. 
 
 8. **tData.F**: Scalar with possible values: 0 and 1. If 0, no external force present. If 1, external forces are present in the environment and the user will have to accordingly create 2 files *extF_eq.m* and *ext_F.m* detailing the forces acting on the nodes at equilibrium and during simulation respectively. The reader is encouraged to go through the example files for the ball and arm for a better understanding of how this is done.
       ```matlab

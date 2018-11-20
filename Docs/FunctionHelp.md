@@ -13,7 +13,12 @@ Function to create the essential parameters that uniquely define the tensegrity 
 Function to generate matrices under the Lagrangian framework described in the [preprint].
 
 ## 5. tensegEq
-Function to find the equilibrium force densities in the strings at t=0, given initial position and minimum force densities in the strings. The equilibrium force densities are then used to find the new rest lengths of the strings and subsequently the cable energies to be used in the Lagrangian dynamics.
+Function to find the equilibrium force densities in the strings at t=0, given initial position and minimum force densities in the strings.
+The initial nodal coordinates (q) are assumed to be given by the user.
+In equation (31) from the [preprint], the first term on the left (\ddot{q}) is taken to be 0.
+The resulting equation is solved for \sigma and \lambda while constraining the force densities (\sigma) to be positive and above the lower bound set by the user.
+The equilibrium force densities are used to find the new rest lengths of the springs from equation 25, and subsequently, cable energies (equation 26) to be used in the Lagrangian dynamics.
+
 
 ## 6. tensegSimTime
 Function to generate simulation time and output interval time-step for simulation and animation.
