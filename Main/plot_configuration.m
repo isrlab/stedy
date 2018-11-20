@@ -2,7 +2,7 @@ function plot_configuration(q,tData,AZ,EL,axLims)
 % /* This Source Code Form is subject to the terms of the Mozilla Public
 % * License, v. 2.0. If a copy of the MPL was not distributed with this
 % * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
-
+% 
 % Function to plot initial configuration of the tensegrity structure
 % 
 % INPUTS: [q, tData, AZ, EL]
