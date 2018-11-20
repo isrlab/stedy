@@ -130,7 +130,7 @@ Bars are modeled as cylinders with a specified density and radius.
       ```matlab
       g = [0;0;-9.806];
       ```
-      The user can choose to avoid having gravity in his simulation environment by making it a vector of zeros.
+      The user can choose to avoid having gravity in his simulation environment by making it a vector of zeros. Generally, we assume the gravity vector to be in the negative z direction.
 
 8. **tData.F**: Scalar with possible values: 0 and 1. If 0, no external force present. If 1, external forces are present in the environment and the user will have to accordingly create 2 files *extF_eq.m* and *ext_F.m* detailing the forces acting on the nodes at equilibrium and during simulation respectively. The reader is encouraged to go through the example files for the ball and arm for a better understanding of how this is done.
       ```matlab
