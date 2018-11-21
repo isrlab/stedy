@@ -22,7 +22,9 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
 
 3. Run setup.m.
 
-      In case an error message is displayed after Step 3, follow the instructions below before Step 4:
+  In case an error message is displayed after Step 3, follow the instructions (collapsed) below. Go to Step 4, otherwise.
+      <details><summary> Click here.  </summary><p>
+
       ```MATLAB
       Editing ode solver failed. Please edit ODE45m manually.
       ```
@@ -63,21 +65,21 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
           end
           ```
     *3c*. After editing, rename the function at the top to ode45m to avoid a warning.
-    
+
           ```matlab
           function varargout = ode45m(ode,tspan,y0,options,varargin)
           ```
 
+</details>
 4. To avoid having to run setup.m everytime you run MATLAB, go to *Set Path* in the Home tab and add the corresponding location of *stedy/Main* to MATLAB's path.
 
 
 Follow *stedy*'s [User Guide] to get started.
 ### References
-1. Shao-Chen Hsu, Vaishnav Tadiparthi and Raktim Bhattacharya, "A Lagrangian Formulation for Constrained Multibody Dynamics in Tensegrity Systems", Manuscript submitted for publication.
-
-    Please contact the authors at addyhsu@tamu.edu, vaishnavtv@tamu.edu, or raktim@tamu.edu for a copy of the submitted paper.
+1. Shao-Chen Hsu, Vaishnav Tadiparthi and Raktim Bhattacharya, "A Lagrangian Formulation for Constrained Multibody Dynamics in Tensegrity Systems", Manuscript submitted for publication. [Preprint] available. 
 
 [User Guide]: UserGuide.md
 [MATLAB Optimization toolbox]: https://www.mathworks.com/products/optimization.html
 [Contributing Guidelines]: ContributingGuidelines.md
 [Code of Conduct]: CodeofConduct.md
+[Preprint]: https://www.researchgate.net/publication/328676032_A_Lagrangian_Formulation_for_Constrained_Multibody_Dynamics_in_Tensegrity_Systems
