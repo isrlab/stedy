@@ -66,7 +66,7 @@ figure(figOptions);hold on;
 %         txt{i} = num2str(i);
 %         text(tData.N(1,i),tData.N(2,i),tData.N(3,i),txt{i},'fontsize',30);
 %     end
-%     axis equal;
-%     axis off;
+    axis equal;
+    axis off;
     view(AZ,EL);
 end

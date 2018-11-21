@@ -127,7 +127,7 @@ x0 = [x0;0]; % Initial Condition - [Position; Velocity; Work];
 %% Plotting
 
 % Plot configuration
-AZ = 0;
+AZ = 30;
 EL = 45;
 axLims = [min(N(1,:))-.3 max(N(1,:))+.3 min(N(2,:))-.3 max(N(2,:))+.3 min(N(3,:))-.3 max(N(3,:))+.3];
 plot_configuration(N(:),tData,AZ,EL,axLims);
