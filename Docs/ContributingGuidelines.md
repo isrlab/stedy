@@ -27,10 +27,10 @@ Problems with this software can be reported in the [issues section](https://gith
 Support for *stedy* is provided on best effort basis by emailing the author at vaishnavtv@tamu.edu.
 
 ## Test Case
-A simple test case ([*TestPendulum.m*]) has been provided in the [Tests] folder of the repository for the user to test their version of the code.
-On running the file, the results of the three checks - Bar Length violations, total energy violations, and motion errors - will be displayed on the command window.
+2 test cases ([*TestPendulum.m*] and [*TestTBar.m*]) has been provided in the [Tests] folder of the repository for the user to test their version of the code.
+On running the files, the results of the three checks - Bar Length violations, total energy violations, and motion errors - will be displayed on the command window.
 
-Please note that the main contributions of the software comprise an efficient Lagrangian formulation of the dynamics and a novel constraint correction method. Improvements to plotting functions are not the focus of this test case.
+Please note that the main contributions of the software comprise an efficient Lagrangian formulation of the dynamics and a novel constraint correction method. Improvements to plotting functions are not the focus of these test cases.
 
 #### Note
 
@@ -40,3 +40,4 @@ contributing guidelines.
 [MATLAB]: http://www.mathworks.com/products/matlab/
 [Tests]: https://github.com/uqLab/stedy/tree/master/Tests
 [*TestPendulum.m*]: https://github.com/uqLab/stedy/blob/master/Tests/TestPendulum.m
+[*TestTBar.m*]: https://github.com/uqLab/stedy/blob/master/Tests/TestTBar.m
