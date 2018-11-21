@@ -57,7 +57,7 @@ figure(figOptions);hold on;
             plot3(NN(1,k),NN(2,k),NN(3,k),'ko','MarkerFaceColor','k')
         end
     end
-    quiver3(zeros(3,1),zeros(3,1),zeros(3,1),[1;0;0],[0;1;0],[0;0;1],'Color','g')
+    quiver3(zeros(3,1),zeros(3,1),zeros(3,1),[1;0;0],[0;1;0],[0;0;1],'Color','b')
     text(0.9,0,0,'x','fontsize',20,'color','b');
     text(0,0.9,0,'y','fontsize',20,'color','b');
     text(0,0,0.9,'z','fontsize',20,'color','b');
