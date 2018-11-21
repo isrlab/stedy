@@ -15,6 +15,7 @@ function xdot = lagTensegrityDynamics(t,x,tData)
 % 
 % x: Solution vector at time t
 % x has the form: [Nodal positions; Nodal velocities; Work]
+% Size of x: 6*length(N) + 1
 % 
 % tData: MATLAB structure containing all fields requisite and pertinent to
 % the dynamics simulation.

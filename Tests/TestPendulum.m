@@ -62,7 +62,8 @@ x0 = [x0;0]; % Initial Condition - [Position; Velocity; Energy];
 
 options = odeset('RelTol',1e-10,'AbsTol',1e-10);
 
-[simTime,tInt] = tensegSimTime(options,tEnd);
+tInt = 0.01;
+simTime = 0:tInt:tEnd;
 
 [t,y] = tensegSim(x0,simTime,tData,options);
 
