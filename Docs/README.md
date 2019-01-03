@@ -1,5 +1,6 @@
 [![Latest release](https://img.shields.io/github/release/uqLab/stedy.svg)](https://github.com/uqLab/stedy/releases)
 [![DOI](https://zenodo.org/badge/151340704.svg)](https://zenodo.org/badge/latestdoi/151340704)
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.01042/status.svg)](https://doi.org/10.21105/joss.01042)
 [![Documentation](https://img.shields.io/badge/documentation-user_guide-brightgreen.svg)](UserGuide.md)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 # Summary
@@ -77,7 +78,7 @@ The software is aimed at researchers familiar with tensegrity structures, but ca
 
 Follow *stedy*'s [User Guide] to get started.
 ### References
-1. Shao-Chen Hsu, Vaishnav Tadiparthi and Raktim Bhattacharya, "A Lagrangian Formulation for Constrained Multibody Dynamics in Tensegrity Systems", Manuscript submitted for publication. [Preprint] available. 
+1. Shao-Chen Hsu, Vaishnav Tadiparthi and Raktim Bhattacharya, "A Lagrangian Formulation for Constrained Multibody Dynamics in Tensegrity Systems", Manuscript submitted for publication. [Preprint] available.
 
 [User Guide]: UserGuide.md
 [MATLAB Optimization toolbox]: https://www.mathworks.com/products/optimization.html
