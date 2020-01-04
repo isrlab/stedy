@@ -29,10 +29,13 @@ function [t,y] = tensegSim(x0,simTime,tData,options)
 
 nn = numel(tData.N);
 
-tData.Energy = 0.5*x0(nn+1:end-1)'*tData.M*x0(nn+1:end-1)-tData.G'*x0(1:nn)+tData.Vs; % Total energy in structure
-if(tData.Correction ~= 2) % Constraint Correction turned on
+if(tData.Correction == 0 || tData.Correction == 1) % Constraint Correction turned on
+    tData.Energy = 0.5*x0(nn+1:end-1)'*tData.M*x0(nn+1:end-1)-tData.G'*x0(1:nn)+tData.Vs; % Total energy in structure
     [t,y] = ode45m(@lagTensegrityDynamics,simTime,x0,options,tData);
-else % No constraint correction 
+elseif tData.Correction == 2 % No constraint correction 
+    tData.Energy = 0.5*x0(nn+1:end-1)'*tData.M*x0(nn+1:end-1)-tData.G'*x0(1:nn)+tData.Vs; % Total energy in structure
     [t,y] = ode45(@lagTensegrityDynamics,simTime,x0,options,tData);
+elseif tData.Correction == 3 % No constraint correction 
+    [t,y] = ode15s(@lagTensegrityDynamics_flex,simTime,x0,options,tData);
 end   
 end
