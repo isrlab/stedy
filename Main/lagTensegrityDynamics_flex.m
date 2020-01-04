@@ -57,10 +57,10 @@ for k=1:tData.nBar
     
     tempMdot = -2*Ibk/lbk^3*(Xk.'*Xk)*lbkdot + Ibkdot/(lbk^2)*(Xk.'*Xk);
     tempMf = Ibk*Xk.'*Xk*lbkdot/lbk^3;
-    tempMq = Ibkdot*(Xk.'*Xk)*lbkdot/lbk^3 ...
+    tempMq = -(Ibkdot*(Xk.'*Xk)*lbkdot/lbk^3 ...
              - 3*(Ibk*(Xk.'*Xk))/(lbk^4)*(lbkdot^2) ...
-             + (qd.'*(Xk.'*Xk)*q/lbk - q.'*(Xk.'*Xk)*qd*lbkdot/lbk^2)*(Ibk*(Xk.'*Xk))/lbk^3;
-    tempMqdd = Ibk*(Xk.'*Xk)*q*q.'*(Xk.'*Xk)/lbk^4;
+             + (qd.'*(Xk.'*Xk)*q/lbk - q.'*(Xk.'*Xk)*qd*lbkdot/lbk^2)*(Ibk*(Xk.'*Xk))/lbk^3);
+    tempMqdd = -Ibk*(Xk.'*Xk)*q*q.'*(Xk.'*Xk)/lbk^4;
     tempXq = Kbk*((Xk.'*Xk) - (Xk.'*Xk)*lbk0/lbk);
     
     Mdot = Mdot + tempMdot;
