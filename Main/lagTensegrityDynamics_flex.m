@@ -7,9 +7,9 @@ function xdot = lagTensegrityDynamics_flex(t,x,tData)
 % solved using ODE45 and the novel constraint correction method. 
 % 
 
-ns = (numel(x))/2; % No. of position/velocity variables
+ns = (numel(x)-1)/2; % No. of position/velocity variables
 q = x(1:ns); % Position vector
-qd = x(ns+1:end); % Velocity vector
+qd = x(ns+1:end-1); % Velocity vector
 
 Forces = tData.G; % Initializing with gravitational force
 Fd = zeros(ns,1);
@@ -110,7 +110,7 @@ end
 
 xSol = M\F1; % Solve the linear equation
 qdd = xSol(1:ns);
-% power = (extF'+Fd')*qd;
+power = (extF'+Fd')*qd;
 
 
-xdot = [qd;qdd];
+xdot = [qd;qdd;power];

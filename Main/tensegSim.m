@@ -36,6 +36,7 @@ elseif tData.Correction == 2 % No constraint correction
     tData.Energy = 0.5*x0(nn+1:end-1)'*tData.M*x0(nn+1:end-1)-tData.G'*x0(1:nn)+tData.Vs; % Total energy in structure
     [t,y] = ode45(@lagTensegrityDynamics,simTime,x0,options,tData);
 elseif tData.Correction == 3 % No constraint correction 
+    tData.Energy = 0.5*x0(nn+1:end-1)'*tData.M*x0(nn+1:end-1)-tData.G'*x0(1:nn)+tData.Vs; % Total energy in structure
     [t,y] = ode15s(@lagTensegrityDynamics_flex,simTime,x0,options,tData);
 end   
 end
