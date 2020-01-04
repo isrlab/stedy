@@ -38,8 +38,8 @@ strings.rLP = [1 0.7 1 0.7];  % Rest lengths of the strings: 0.7 means 70%
 % Bars
 bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
 bars.rho = 500*ones(1,tData.nBar); % Density of bars
-bars.nu = 0.32*ones(1,tData.nBar); % Poisson's ratio of bars (aluminium)
-bars.E = 69e9*ones(1,tData.nBar); % Young's modulus of bars
+bars.nu = 0.30*ones(1,tData.nBar); % Poisson's ratio of bars (aluminium)
+bars.E = 200e9*ones(1,tData.nBar); % Young's modulus of bars
 % Point Masses
 Mp = ones(1,tData.nPm); % All point masses initialised with a mass of 1
 
@@ -52,13 +52,13 @@ tData = tensegGenMat(tData,bars,strings,Mp,g);
 
 %% Simulation Inputs
 tData.F = 0; % If 1, external forces are present in structure, not if 0.
-tData.Correction = 3; % If 1, constraint correction inclusive of total energy constraint If 0, only linear and bar length constraint violations corrected. 
+tData.Correction = 3; % Compressible Bar 
 tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
 
 %% Final Simulation
-tEnd = 1; % Simulation End Time
+tEnd = 10; % Simulation End Time
 
-x0 = [x0]; % Initial Condition - [Position; Velocity; Energy];
+x0 = [x0;0]; % Initial Condition - [Position; Velocity; Energy];
 
 options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
 
