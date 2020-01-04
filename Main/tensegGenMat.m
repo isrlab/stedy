@@ -84,10 +84,15 @@ if(tData.nBar > 0)
         L = norm(b);
         mk = bars.rho(k)*(pi*bars.r(k)^2)*L;
         Ik = (mk/12)*(L^2); 
+        % Stiffness under compression = AE/L
+        Kk = bars.E(k)*(pi*bars.r(k)^2)/L; 
         M = M + mk*Xkbar'*Xkbar + (Ik/L^2)*Xk'*Xk;
         G = G + mk*Xkbar'*tData.g; 
         NLin(k).Mat = Xk'*Xk; % Nonlinear constraints pertaining to bar lengths
         bars.L0(k,1) = L; % Initial lengths of bars
+        bars.listM(k) = mk; % Mass of each bar
+        bars.listI(k) = Ik; % Inertia of each bar
+        bars.listK(k) = Kk; % Stiffness of each bar
         tData.listX{k} = Xk;
         tData.listXbar{k} = Xkbar;
     end
