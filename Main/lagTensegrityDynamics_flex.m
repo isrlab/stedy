@@ -101,7 +101,7 @@ else
 end
     
 if(tData.nStr>0) % If strings present in structure
-    F1_qdd = Cab_En - Mq.'*q - Xq.'*q - Mqd.'*qd + tData.G + extF; ;
+    F1_qdd = Cab_En - Mq.'*q - Xq.'*q - Mqd.'*qd + tData.G + extF + Fd;
     F1 = [F1_qdd;hessR]; % No gravity
 else
     F1 = [tData.G+extF + Fd;hessR];

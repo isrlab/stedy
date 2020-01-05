@@ -38,6 +38,7 @@ strings.rLP = [1 0.7 1 0.7];  % Rest lengths of the strings: 0.7 means 70%
 % Bars
 bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
 bars.rho = 500*ones(1,tData.nBar); % Density of bars
+bars.E = 200e9*ones(1,tData.nBar); % Young's modulus of bars. (Only for compressible bars.)
 
 % Point Masses
 Mp = ones(1,tData.nPm); % All point masses initialised with a mass of 1

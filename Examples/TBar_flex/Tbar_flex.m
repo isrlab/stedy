@@ -40,6 +40,7 @@ bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
 bars.rho = 500*ones(1,tData.nBar); % Density of bars
 bars.nu = 0.30*ones(1,tData.nBar); % Poisson's ratio of bars (aluminium)
 bars.E = 200e9*ones(1,tData.nBar); % Young's modulus of bars
+
 % Point Masses
 Mp = ones(1,tData.nPm); % All point masses initialised with a mass of 1
 
