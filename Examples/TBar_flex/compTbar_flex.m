@@ -1,7 +1,7 @@
 % /* This Source Code Form is subject to the terms of the Mozilla Public
 % * License, v. 2.0. If a copy of the MPL was not distributed with this
 % * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
-
+% 
 % To compare Tbar w/o correction against Tbar_flex.
 clc; clear;
 
@@ -66,16 +66,19 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
 [simTime,tInt] = tensegSimTime(options,tEnd);
 
 tData.Correction = 2; % Rigid Bar 
+tic
 [t,y] = tensegSim(x0,simTime,tData,options);
+compTime = toc
 
 tData.Correction = 3; % Compressible Bar 
+tic
 [tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
-
+compTimeFlex = toc
 %% Plotting 
 
 % Overlay Motion Plots
 plotCompTbar_flex(t,y,tFlex,yFlex,tData);
 
-print(figure(1),'compTBarFlex_MotionNode3','-djpeg');
-print(figure(2),'compTBarFlex_MotionNode4','-djpeg');
+% print(figure(3),'compTBarFlex_MotionNode3','-depsc');
+% print(figure(4),'compTBarFlex_MotionNode4','-depsc');
 
