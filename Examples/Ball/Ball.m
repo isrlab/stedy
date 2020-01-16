@@ -2,7 +2,7 @@
 % * License, v. 2.0. If a copy of the MPL was not distributed with this
 % * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
 % 
-% This file demostrates an example of a ball-shaped tensegrity strucute,
+% This file demonstrates an example of a ball-shaped tensegrity strucute,
 % which is formulated by 6 bars, 32 strings and 1 point mass at the geometric 
 % center of the structure.
 %
@@ -92,7 +92,7 @@ bars.index = 1:tData.nBar;
 bars.rho = 1300*ones(tData.nBar,1);
 bars.r = 1/100*ones(tData.nBar,1);
 bars.nu = 0.36; % Poisson's ratio (PLA)
-bars.E = 3.5E9; % Young's Modulus of PLA
+bars.E = 3.5E9*ones(tData.nBar,1); % Young's Modulus of PLA
 
 % Point Masses
 Mp = ones(1,tData.nPm);
