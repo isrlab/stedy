@@ -54,8 +54,8 @@ strings.rLP = 1*ones(1,tData.nStr);  % Rest length percentage
 % Bars
 bars.index = 1:tData.nBar;
 bars.rho = 960*ones(tData.nBar,1);
-bars.r = 1.5/100*ones(tData.nBar,1);
-bars.nu = 0.46; % Poisson's ratio (hdpe)
+bars.r = 2/100*ones(tData.nBar,1);
+bars.nu = 0.46*ones(tData.nBar,1); % Poisson's ratio (hdpe)
 bars.E = 1E9*ones(tData.nBar,1); % Young's Modulus of hdpe
 
 % Point Masses
@@ -67,7 +67,6 @@ tData = tensegGenMat(tData,bars,strings,Mp,g);
 
 %% Simulation Inputs
 tData.F = 1; % If 1, external forces are present in structure, not if 0.
-tData.Correction = 3; % If 1, constraint correction inclusive of total energy constraint If 0, only linear and bar length constraint violations corrected. 
 % tData.damper = 0.1*ones(1,tData.nStr);
 % Dampers are not being used on strings in this example. 
 
@@ -76,7 +75,7 @@ tData.Correction = 3; % If 1, constraint correction inclusive of total energy co
 % under gravity and subjected to external forces. 
 tData.minforce = -Inf; % Lower bound for force densities in the strings
 % Equilibirum for compressible bars, removed nonlinear constraints
-tData = tensegEqComp(x0,N(:),tData); 
+tData = tensegEq(x0,N(:),tData); 
 
 
 %% Final Simulation
@@ -88,18 +87,33 @@ x0 = [x0;0]; % Initial Condition - [Position; Velocity; Work];
 
 [simTime,tInt] = tensegSimTime(options,tEnd);
 
-% [t,y] = tensegSim(x0,simTime,tData,options);
+tData.Correction = 2; % Rigid Bar 
+tic
+[t,y] = tensegSim(x0,simTime,tData,options);
+compTime = toc
+
+tData.Correction = 3; % Compressible Bar 
+tic
+[tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
+compTimeFlex = toc
 
 %% Plotting
 
 % Plot configuration
-AZ = 30;
-EL = 45;
-axLims = [min(N(1,:))-.3 max(N(1,:))+.3 min(N(2,:))-.3 max(N(2,:))+.3 min(N(3,:))-.3 max(N(3,:))+.3];
-plot_configuration(N(:),tData,AZ,EL,axLims);
+% AZ = 30;
+% EL = 45;
+% axLims = [min(N(1,:))-.3 max(N(1,:))+.3 min(N(2,:))-.3 max(N(2,:))+.3 min(N(3,:))-.3 max(N(3,:))+.3];
+% plot_configuration(N(:),tData,AZ,EL,axLims);
 
 % Plot Output Trajectories
-% plotMotion(t,y,tData);
+% plotMotion(tFlex,yFlex,tData);
+
+% Diff. in Motion Plots
+plotComp3strut_flex(t,y,tFlex,yFlex,tData);
+
+% print(figure(1),'comp3strutFlex_MotionNode4','-depsc');
+% print(figure(2),'comp3strutFlex_MotionNode5','-depsc');
+% print(figure(3),'comp3strutFlex_MotionNode6','-depsc');
 
 % Plot Constraint Violations
 % plotConstr(t,y,tData);
