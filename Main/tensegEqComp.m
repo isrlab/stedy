@@ -30,18 +30,18 @@ function tData = tensegEqComp(x0,x,tData)
 
 %% Construct gradR
 nLC = size(tData.Lin.A,1); % Number of linear constraints
-% nNLC = numel(tData.NLin); % Number of non-linear constraints
-nConstr = nLC;% + nNLC;
+nNLC = numel(tData.NLin); % Number of non-linear constraints
+nConstr = nLC + nNLC;
 
 gradLin = tData.Lin.A; % linear constraint,
 
-% gradNLin = [];
-% 
-% for i=1:nNLC
-%     gradNLin = [gradNLin;x'*tData.NLin(i).Mat];
-% end
+gradNLin = [];
 
-gradR = gradLin;
+for i=1:nNLC
+    gradNLin = [gradNLin;x'*tData.NLin(i).Mat];
+end
+
+gradR = [gradLin;gradNLin];
 
 %% Setting up linear programming problem
 n = numel(x);
