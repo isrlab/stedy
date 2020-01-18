@@ -30,30 +30,46 @@ function tData = tensegEqComp(x0,x,tData)
 
 %% Construct gradR
 nLC = size(tData.Lin.A,1); % Number of linear constraints
-nNLC = numel(tData.NLin); % Number of non-linear constraints
-nConstr = nLC + nNLC;
+% nNLC = numel(tData.NLin); % Number of non-linear constraints
+nConstr = nLC;% + nNLC;
 
 gradLin = tData.Lin.A; % linear constraint,
 
-gradNLin = [];
+% gradNLin = [];
+% 
+% for i=1:nNLC
+%     gradNLin = [gradNLin;x'*tData.NLin(i).Mat];
+% end
 
-for i=1:nNLC
-    gradNLin = [gradNLin;x'*tData.NLin(i).Mat];
-end
-
-gradR = [gradLin;gradNLin];
+gradR = [gradLin];%;gradNLin];
 
 %% Setting up linear programming problem
 n = numel(x);
 Y = cell2mat(tData.Y);
 L = reshape(Y'*x, n, tData.nStr);
 
+% Equilibrium equation for dynamics with compressible bars 
+% (eqn. 56) with qd and qdd terms removed.
+Xq = zeros(size(tData.M));
+bars = tData.bars;
+for k=1:tData.nBar
+    Xk = tData.listX{k};
+    lbk = norm(Xk*x); % Length of bar k
+    lbk0 = bars.L0(k); % Rest length of bar k
+    Kbk = bars.listK(k); % Stiffness of each bar
+    
+    tempXq = Kbk*((Xk.'*Xk) - (Xk.'*Xk)*lbk0/lbk);
+    
+    Xq = Xq + tempXq;
+end
+
 Aeq = [L -gradR'];
+beq = Xq.'*x;
 
 if(tData.F)
     run('extF_eq');
-    beq = tData.G + extF;
-else beq = tData.G;
+    beq = beq + tData.G + extF;
+else beq = beq + tData.G;
 end
 
 LB = [tData.minforce*ones(tData.nStr,1);-Inf*ones(nConstr,1)];
