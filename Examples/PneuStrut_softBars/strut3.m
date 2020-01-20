@@ -57,6 +57,7 @@ bars.rho = 960*ones(tData.nBar,1);
 bars.r = 2/100*ones(tData.nBar,1);
 bars.nu = 0.46*ones(tData.nBar,1); % Poisson's ratio (hdpe)
 bars.E = 1E9*ones(tData.nBar,1); % Young's Modulus of hdpe
+% bars.rLP = 0.8*ones(tData.nBar,1); % Rest Length of bars
 
 % Point Masses
 Mp = ones(1,tData.nPm);
@@ -74,9 +75,9 @@ tData.F = 1; % If 1, external forces are present in structure, not if 0.
 % To find force densities in the bars and strings at equilibrium when
 % under gravity and subjected to external forces. 
 tData.minforce = -Inf; % Lower bound for force densities in the strings
-% Equilibirum for compressible bars, removed nonlinear constraints
-tData = tensegEq(x0,N(:),tData); 
-
+% Equilibrium for compressible bars, removed nonlinear constraints
+tDataComp = tensegEqComp(x0,N(:),tData); 
+tData = tensegEqComp(x0,N(:),tData);
 
 %% Final Simulation
 tEnd = 1; % Simulation End Time
@@ -92,9 +93,9 @@ tic
 [t,y] = tensegSim(x0,simTime,tData,options);
 compTime = toc
 
-tData.Correction = 3; % Compressible Bar 
+tDataComp.Correction = 3; % Compressible Bar 
 tic
-[tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
+[tFlex,yFlex] = tensegSim(x0,simTime,tDataComp,options);
 compTimeFlex = toc
 
 %% Plotting
@@ -106,10 +107,10 @@ compTimeFlex = toc
 % plot_configuration(N(:),tData,AZ,EL,axLims);
 
 % Plot Output Trajectories
-% plotMotion(tFlex,yFlex,tData);
+% plotMotion(tFlex,yFlex,tDataComp);
 
 % Diff. in Motion Plots
-plotComp3strut_flex(t,y,tFlex,yFlex,tData);
+plotComp3strut_flex(t,y,tFlex,yFlex);
 
 % print(figure(1),'comp3strutFlex_MotionNode4','-depsc');
 % print(figure(2),'comp3strutFlex_MotionNode5','-depsc');

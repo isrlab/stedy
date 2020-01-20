@@ -51,20 +51,26 @@ L = reshape(Y'*x, n, tData.nStr);
 % Equilibrium equation for dynamics with compressible bars 
 % (eqn. 56) with qd and qdd terms removed.
 Xq = zeros(size(tData.M));
+beq = zeros(size(Xq.'*x));
 bars = tData.bars;
+alpha = cell(1,tData.nBar);
+lb = zeros(tData.nBar,1);
 for k=1:tData.nBar
     Xk = tData.listX{k};
-    lbk = norm(Xk*x); % Length of bar k
-    lbk0 = bars.L0(k); % Rest length of bar k
-    Kbk = bars.listK(k); % Stiffness of each bar
-    
-    tempXq = Kbk*((Xk.'*Xk) - (Xk.'*Xk)*lbk0/lbk);
-    
-    Xq = Xq + tempXq;
+    lb(k) = norm(Xk*x); % Length of bar k
+    Ak = pi*bars.r(k)^2;
+    alpha{k} = Ak*bars.E(k)*(Xk.'*Xk)*x;
+    beq = beq + alpha{k}.'*x/lb(k);
+%     lbk0 = bars.L0(k); % Rest length of bar k
+%     Kbk = bars.listK(k); % Stiffness of each bar
+%     
+%     tempXq = Kbk*((Xk.'*Xk) - (Xk.'*Xk)*lbk0/lbk);
+%     
+%     Xq = Xq + tempXq;
 end
-
-Aeq = [L -gradR'];
-beq = Xq.'*x;
+alphaK = cell2mat(alpha);
+Aeq = [L -gradR' alphaK];
+% beq = Xq.'*x;
 
 if(tData.F)
     run('extF_eq');
@@ -72,9 +78,10 @@ if(tData.F)
 else beq = beq + tData.G;
 end
 
-LB = [tData.minforce*ones(tData.nStr,1);-Inf*ones(nConstr,1)];
+LB = [tData.minforce*ones(tData.nStr,1);-Inf*ones(nConstr,1);...
+        -Inf*ones(tData.nBar,1)];%1./lb
 
-UB = Inf*ones(tData.nStr + nConstr,1);
+UB = Inf*ones(tData.nStr + nConstr + tData.nBar,1);
 options = optimoptions('linprog','Display','iter');
 [SigLamb,fval,exitflag] = linprog([],[],[],Aeq,beq,LB,UB,[],options);
 
@@ -84,9 +91,11 @@ if(exitflag ~= 1)
 end
 
 sigma = SigLamb(1:tData.nStr);
-
+rlBar = SigLamb(end - tData.nBar+1:end);
 textSprFD = sprintf('%f \n',sigma); 
+textBarRL = sprintf('%f \n',rlBar); 
 fprintf('Force Densities in Strings at Equilibrium: \n %s \n',textSprFD)
+fprintf('Rest Lengths of Bars at Equilibrium: \n %s \n',textBarRL)
 
 %% Computing Total Energy in Structure at Equilibrium
 Vs = 0; % Potential Energy in Strings
