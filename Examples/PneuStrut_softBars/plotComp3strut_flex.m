@@ -1,4 +1,4 @@
-function plotComp3strut_flex(t1,y1,t2,y2,tData)
+function plotComp3strut_flex(t1,y1,t2,y2)
 % /* This Source Code Form is subject to the terms of the Mozilla Public
 % * License, v. 2.0. If a copy of the MPL was not distributed with this
 % * file, You can obtain one at http://mozilla.org/MPL/2.0/. 

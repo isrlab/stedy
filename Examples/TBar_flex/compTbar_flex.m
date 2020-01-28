@@ -61,7 +61,7 @@ tEnd = 10; % Simulation End Time
 
 x0 = [x0;0]; % Initial Condition - [Position; Velocity; Energy];
 
-options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
+options = odeset('RelTol',1e-10,'AbsTol',1e-10);%,'Refine',1);
 
 [simTime,tInt] = tensegSimTime(options,tEnd);
 
@@ -78,7 +78,7 @@ compTimeFlex = toc
 
 % Overlay Motion Plots
 plotCompTbar_flex(t,y,tFlex,yFlex,tData);
-
-% print(figure(3),'compTBarFlex_MotionNode3','-depsc');
-% print(figure(4),'compTBarFlex_MotionNode4','-depsc');
+% 
+print(figure(3),'errorCompTBarFlex_MotionNode3','-depsc');
+print(figure(4),'errorCompTBarFlex_MotionNode4','-depsc');
 

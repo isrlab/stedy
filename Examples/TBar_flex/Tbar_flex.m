@@ -65,8 +65,9 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
 
 [simTime,tInt] = tensegSimTime(options,tEnd);
 
+tic
 [t,y] = tensegSim(x0,simTime,tData,options);
-
+compTime = toc
 %% Plotting 
 
 % Plot Configuration

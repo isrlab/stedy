@@ -81,7 +81,7 @@ end
 LB = [tData.minforce*ones(tData.nStr,1);-Inf*ones(nConstr,1);...
         -Inf*ones(tData.nBar,1)];%1./lb
 
-UB = Inf*ones(tData.nStr + nConstr + tData.nBar,1);
+UB = [Inf*ones(tData.nStr + nConstr + tData.nBar,1)];%1./lb];
 options = optimoptions('linprog','Display','iter');
 [SigLamb,fval,exitflag] = linprog([],[],[],Aeq,beq,LB,UB,[],options);
 
@@ -91,7 +91,7 @@ if(exitflag ~= 1)
 end
 
 sigma = SigLamb(1:tData.nStr);
-rlBar = SigLamb(end - tData.nBar+1:end);
+rlBar = 1./SigLamb(end - tData.nBar+1:end);
 textSprFD = sprintf('%f \n',sigma); 
 textBarRL = sprintf('%f \n',rlBar); 
 fprintf('Force Densities in Strings at Equilibrium: \n %s \n',textSprFD)
