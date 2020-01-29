@@ -67,11 +67,12 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
 
 tData.Correction = 3; % Compressible Bar 
 tic
-[tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
+linSys = linSysComp(x0, tData);
+% [tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
 compTimeFlex = toc
 %% Plotting 
 % Plot Output Trajectories
-plotMotion(tFlex, yFlex, tData);
+% plotMotion(tFlex, yFlex, tData);
 
 % Overlay Motion Plots
 % plotCompTbar_flex(t,y,tFlex,yFlex,tData);
