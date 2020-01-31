@@ -88,7 +88,7 @@ for k=1:tData.nBar
     tempMq = -(Ibkdot*(X{k})*lbkdot/lbk^3 ...
              - 3*(Ibk*(X{k}))/(lbk^4)*(lbkdot^2) ...
              + (qd.'*(X{k})*q/lbk - q.'*(X{k})*qd*lbkdot/lbk^2)*(Ibk*(X{k}))/lbk^3);
-    tempMqdd = -Ibk*(X{k})*q*q.'*(X{k})/lbk^4;
+    tempMqdd = -Ibk*(X{k})*(q*q.')*(X{k})/lbk^4;
     tempXq = Kbk*((X{k}) - (X{k})*lbk0/lbk);
     tempdMq_dqd = vec(- Ibk/lbk^4*(X{k}) + Ibkdd/lbk^2*(X{k}));
     
