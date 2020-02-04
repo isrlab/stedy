@@ -14,6 +14,8 @@ N = [0  5*cos(theta)  5*cos(theta)              0;
 fixedNodes = [1 1 1;1 1 1; 0 1 0; 0 1 0;]'; % To identify which coordinates of a node are fixed: 1-fixed, 0-unfixed
                                             % Same size as N
 
+% fixedNodes = [0 1 0;0 1 0; 0 1 0; 0 1 0;]'; 
+
 % Connectivity Matrices
 % Cb an Cs have been defined independently. 
 Cb = [-1  0  1  0; 
