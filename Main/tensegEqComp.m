@@ -46,30 +46,32 @@ gradR = [gradLin];%;gradNLin];
 %% Setting up linear programming problem
 n = numel(x);
 Y = cell2mat(tData.Y);
-L = reshape(Y'*x, n, tData.nStr);
+X = cell2mat(tData.X);
+L1 = reshape(Y'*x, n, tData.nStr);
+L2 = -reshape(X'*x, n, tData.nBar); % - (minus) for compression
 
 % Equilibrium equation for dynamics with compressible bars 
 % (eqn. 56) with qd and qdd terms removed.
 Xq = zeros(size(tData.M));
 beq = zeros(size(Xq.'*x));
-bars = tData.bars;
-alpha = cell(1,tData.nBar);
-lb = zeros(tData.nBar,1);
-for k=1:tData.nBar
-    Xk = tData.listX{k};
-    lb(k) = norm(Xk*x); % Length of bar k
-    Ak = pi*bars.r(k)^2;
-    alpha{k} = Ak*bars.E(k)*(Xk.'*Xk)*x;
-    beq = beq + alpha{k}.'*x/lb(k);
-%     lbk0 = bars.L0(k); % Rest length of bar k
-%     Kbk = bars.listK(k); % Stiffness of each bar
-%     
-%     tempXq = Kbk*((Xk.'*Xk) - (Xk.'*Xk)*lbk0/lbk);
-%     
-%     Xq = Xq + tempXq;
-end
-alphaK = cell2mat(alpha);
-Aeq = [L -gradR' alphaK];
+% bars = tData.bars;
+% alpha = cell(1,tData.nBar);
+% lb = zeros(tData.nBar,1);
+% for k=1:tData.nBar
+%     Xk = tData.listX{k};
+%     lb(k) = norm(Xk*x); % Length of bar k
+%     Ak = pi*bars.r(k)^2;
+%     alpha{k} = Ak*bars.E(k)*(Xk.'*Xk)*x;
+%     beq = beq + alpha{k}.'*x/lb(k);
+% %     lbk0 = bars.L0(k); % Rest length of bar k
+% %     Kbk = bars.listK(k); % Stiffness of each bar
+% %     
+% %     tempXq = Kbk*((Xk.'*Xk) - (Xk.'*Xk)*lbk0/lbk);
+% %     
+% %     Xq = Xq + tempXq;
+% end
+% alphaK = cell2mat(alpha);
+Aeq = [L1 L2 -gradR'];
 % beq = Xq.'*x;
 
 if(tData.F)
@@ -78,8 +80,8 @@ if(tData.F)
 else beq = beq + tData.G;
 end
 
-LB = [tData.minforce*ones(tData.nStr,1);-Inf*ones(nConstr,1);...
-        -Inf*ones(tData.nBar,1)];%1./lb
+LB = [tData.minforce*ones(tData.nStr,1); tData.minforce*ones(tData.nBar,1);...
+        -Inf*ones(nConstr,1)];%1./lb
 
 UB = [Inf*ones(tData.nStr + nConstr + tData.nBar,1)];%1./lb];
 options = optimoptions('linprog','Display','iter');
@@ -91,23 +93,29 @@ if(exitflag ~= 1)
 end
 
 sigma = SigLamb(1:tData.nStr);
-rlBar = 1./SigLamb(end - tData.nBar+1:end);
+% rlBar = 1./SigLamb(tData.nStr+1:tData.nStr+tData.nBar);
+psi = SigLamb(tData.nStr+1:tData.nStr+tData.nBar);
+lamb = SigLamb(tData.nStr+ tData.nBar+1:end);
 textSprFD = sprintf('%f \n',sigma); 
-textBarRL = sprintf('%f \n',rlBar); 
+textBarFD = sprintf('%f \n',psi); 
 fprintf('Force Densities in Strings at Equilibrium: \n %s \n',textSprFD)
-fprintf('Rest Lengths of Bars at Equilibrium: \n %s \n',textBarRL)
+fprintf('Force Densities in Bars at Equilibrium: \n %s \n',textBarFD)
 
+
+lhs = kron(sigma.',eye(n))*Y.'*x - kron(psi.',eye(n))*X.'*x ...
+        - gradR.'*lamb;
+rhs = beq;    
 %% Computing Total Energy in Structure at Equilibrium
 Vs = 0; % Potential Energy in Strings
 if(tData.nStr>0)
     S = tData.N*tData.Cs'; % Strings
     for k=1:tData.nStr        
         s = S(:,k);
-        L = norm(s); % Initial length between string nodes
-        K(k) = tData.strings.E(k)*pi*(tData.strings.r(k))^2/L + sigma(k); % Stiffness of string
-        Lk(k) = L*(1-sigma(k)/K(k));
-        if Lk(k) < L
-            Vs = Vs+0.5*K(k)*(L-Lk(k))^2;
+        L1 = norm(s); % Initial length between string nodes
+        K(k) = tData.strings.E(k)*pi*(tData.strings.r(k))^2/L1 + sigma(k); % Stiffness of string
+        Lk(k) = L1*(1-sigma(k)/K(k));
+        if Lk(k) < L1
+            Vs = Vs+0.5*K(k)*(L1-Lk(k))^2;
         end
     end 
     tData.Lk = Lk;
@@ -115,5 +123,5 @@ if(tData.nStr>0)
 end 
 tData.Vs = Vs;
 tData.sigmaEq = sigma; % Force densities in springs at equilibrium
-
+tData.psiEq = psi; % Force densities in bars at equilibrium
 end

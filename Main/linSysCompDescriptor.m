@@ -1,4 +1,4 @@
-function linSys = linSysCompDescriptor(x,tData)
+function [linSys,sysSS] = linSysCompDescriptor(x,tData)
 % This Source Code Form is subject to the terms of the Mozilla Public
 % License, v. 2.0. If a copy of the MPL was not distributed with this
 % file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,23 +14,24 @@ Forces = tData.G; % Initializing with gravitational force
 Fd = zeros(ns,1);
 
 % Cables
-if(tData.nStr>0) % If strings present in structure
-    sig_k = zeros(tData.nStr,1); % Force Densities
-    for i=1:tData.nStr
-        sk = tData.listY{i}*q;
-        dsk = tData.listY{i}*qd;
-        if tData.Lk(i)<norm(sk)
-            sig_k(i) = tData.K(i)*(1 - tData.Lk(i)/norm(sk));
-            if isfield(tData,'damper') % If dampers present in structure
-                Fd = Fd+((-tData.damper(i)*(dsk'*sk)*sk/(sk'*sk))'*tData.listY{i})';
-            end
-        end
-        Forces = Forces - sig_k(i)*tData.Y{i}'*tData.Y{i}*q;
-    end
-    Cab_En = -kron(sig_k',eye(ns))*(cell2mat(tData.Y))'*q;
-
-end
-
+% if(tData.nStr>0) % If strings present in structure
+%     sig_k = zeros(tData.nStr,1); % Force Densities
+%     for i=1:tData.nStr
+%         sk = tData.listY{i}*q;
+%         dsk = tData.listY{i}*qd;
+%         if tData.Lk(i)<norm(sk)
+%             sig_k(i) = tData.K(i)*(1 - tData.Lk(i)/norm(sk));
+%             if isfield(tData,'damper') % If dampers present in structure
+%                 Fd = Fd+((-tData.damper(i)*(dsk'*sk)*sk/(sk'*sk))'*tData.listY{i})';
+%             end
+%         end
+%         Forces = Forces - sig_k(i)*tData.Y{i}'*tData.Y{i}*q;
+%     end
+%     Cab_En = -kron(sig_k',eye(ns))*(cell2mat(tData.Y))'*q;
+% 
+% end
+sig_k = tData.sigmaEq; % FD in strings at Eq
+psi_k = tData.psiEq; % FD in bars at Eq
 % Bars
 % Mqdd, Mqd, Mq
 % Mqd = Mdot - Mf
@@ -108,7 +109,7 @@ for k=1:tData.nBar
     tempdMqd_dqdxqd = -3*Ibk/lbk^3*X{k}*qd*dlbkd_dqd ...
                       + X{k}/lbk^2*qd*d_dIbkdt_dqd;
     
-    tempdMqd_dqxq = -3*Ibk*X{k}*qd/lbk^3*dlbkd_dq - ...
+    tempdMqd_dqxqd = -3*Ibk*X{k}*qd/lbk^3*dlbkd_dq - ...
                     - 3*Ibk*lbkdot*X{k}*qd/lbk^4*dlbk_dq...
                     + X{k}*qd/lbk^2*d_dIbkdt_dq...
                     -2*Ibkdot*X{k}*qd/lbk^3*dlbk_dq...
@@ -117,7 +118,7 @@ for k=1:tData.nBar
     tempdMq_dqdxq = X{k}*q*lbkdot/lbk^3*d_dIbkdt_dqd ...
                     + Ibkdot*X{k}*q/lbk^3*dlbkd_dqd ...
                     - 6*Ibk*X{k}*q*lbkdot/lbk^4*dlbkd_dqd ...
-                    + (Ibk*X{k}/lbk^3)*(2*X{k}*q*q.'/lbk ...
+                    + (Ibk*X{k}/lbk^3)*(2*X{k}*q*qd.'/lbk ...
                     - q*q.'*X{k}*lbkdot/lbk^2 ...
                     - q*q.'*X{k}*qd/lbk^2*dlbkd_dqd);
     
@@ -127,7 +128,7 @@ for k=1:tData.nBar
     Mqdd = Mqdd + tempMqdd;
     Xq = Xq + tempXq;
     dMqd_dqdxqd = dMqd_dqdxqd + tempdMqd_dqdxqd;
-    dMqd_dqxqd = dMqd_dqxqd + tempdMqd_dqxq;
+    dMqd_dqxqd = dMqd_dqxqd + tempdMqd_dqxqd;
     dMq_dqdxq = dMq_dqdxq + tempdMq_dqdxq;
 end
 Mqd = Mdot - Mf;
@@ -146,7 +147,7 @@ Xhat = reshape(XTq,[ns,tData.nBar]);
 
 
 % xi3 = Cab_En - Mq.'*q - Xq.'*q - Mqd.'*qd + tData.G + extF + Fd;
-dxi3_dq = -(Mq.' + Xq.'+ ...
+dxi3_dq = -(Mq.' + kron(psi_k',eye(ns))*(cell2mat(tData.X))' + ...
             kron(sig_k',eye(ns))*(cell2mat(tData.Y))')...
             - dMqd_dqxqd; 
 dxi3_dqd = -dMq_dqdxq - Mqd.' - dMqd_dqdxqd;
@@ -165,4 +166,8 @@ linSys.Bu = [zeros(ns,tData.nStr) zeros(ns,tData.nBar);
              M_beta*dxi3_dsigma M_beta*dxi3_dpsi];
          
 linSys.Bf = [zeros(ns,ns); M_beta*dxi3_df];
+
+linSys.C = eye(size(linSys.A));
+linSys.D = zeros(size(linSys.Bu));
+sysSS = ss(linSys.A, linSys.Bu, linSys.C, linSys.D);
 end

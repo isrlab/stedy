@@ -11,6 +11,10 @@ theta = pi/4; % To help describe angular position of any node
 N = [0  5*cos(theta)  5*cos(theta)              0;
      0            0              0              0;
      0            0   5*sin(theta)   5*sin(theta);];
+ 
+N = [0  6*cos(theta)  6*cos(theta)     cos(theta);
+     0            0              0              0;
+     0            0   6*sin(theta)   5*sin(theta);]; 
 
 fixedNodes = [1 1 1;1 1 1; 0 1 0; 0 1 0;]'; % To identify which coordinates of a node are fixed: 1-fixed, 0-unfixed
                                             % Same size as N
@@ -34,7 +38,8 @@ x0 = [N(:); 0*N(:)];
 % Strings
 strings.r = 1/1000*ones(1,tData.nStr); % Radius of strings
 strings.E = 7e7*ones(1,tData.nStr); % Young's Modulus of Nylon
-strings.rLP = [1 0.7 1 0.7];  % Rest lengths of the strings: 0.7 means 70% 
+strings.rLP = ones(1,tData.nStr);  % Rest lengths of the strings: 0.7 means 70% 
+% strings.rLP = [1 0.7 1 0.7];  % Rest lengths of the strings: 0.7 means 70% 
 
 % Bars
 bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
@@ -55,6 +60,8 @@ tData = tensegGenMat(tData,bars,strings,Mp,g);
 %% Simulation Inputs
 tData.F = 0; % If 1, external forces are present in structure, not if 0.
 tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
+tData.minforce = 1; % Lower bound for force densities in the strings
+tData = tensegEqComp(x0,N(:),tData);
 
 %% Final Simulation
 tEnd = 10; % Simulation End Time
@@ -67,8 +74,11 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
 
 tData.Correction = 3; % Compressible Bar 
 tic
-linSys = linSysCompDescriptor(x0, tData);
+[linSys,sysSS] = linSysCompDescriptor(x0, tData);
+Asys = linSys.A; Bsys = linSys.Bu; 
+Csys = linSys.C; Dsys = linSys.D;
 % [tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
+minSys = minreal(sysSS);% [tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
 compTimeFlex = toc
 %% Plotting 
 % Plot Output Trajectories
