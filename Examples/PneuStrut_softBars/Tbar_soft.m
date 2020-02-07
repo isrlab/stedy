@@ -8,15 +8,15 @@ clc; clear;
 %% Define initial nodal coordinates and connectivity matrices
 theta = pi/4; % To help describe angular position of any node
 
-N = [0  5*cos(theta)  5*cos(theta)              0;
-     0            0              0              0;
-     0            0   5*sin(theta)   5*sin(theta);];
+% N = [0  5*cos(theta)  5*cos(theta)              0;
+%      0            0              0              0;
+%      0            0   5*sin(theta)   5*sin(theta);];
  
 N = [0  6*cos(theta)  6*cos(theta)     cos(theta);
      0            0              0              0;
      0            0   6*sin(theta)   5*sin(theta);]; 
 
-fixedNodes = [1 1 1;1 1 1; 0 1 0; 0 1 0;]'; % To identify which coordinates of a node are fixed: 1-fixed, 0-unfixed
+fixedNodes = [1 1 0;1 1 0; 0 1 0; 0 1 0;]'; % To identify which coordinates of a node are fixed: 1-fixed, 0-unfixed
                                             % Same size as N
 
 % Connectivity Matrices
@@ -32,7 +32,11 @@ Cs = [-1  1  0  0;
 tData = tensegConstruct(N,Cb,Cs,fixedNodes);
 
 % Vector of Initial Nodal Positions and Velocities
-x0 = [N(:); 0*N(:)];
+v0 = [0 0 0 0;
+      0 0 0 0;
+      1 1 1 1;];
+x0 = [N(:); v0(:)];  
+% x0 = [N(:); 0*N(:)];
 
 %% Material and Simulation Environment properties
 % Strings
@@ -59,9 +63,9 @@ tData = tensegGenMat(tData,bars,strings,Mp,g);
 
 %% Simulation Inputs
 tData.F = 0; % If 1, external forces are present in structure, not if 0.
-tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
+% tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
 tData.minforce = 1; % Lower bound for force densities in the strings
-tData = tensegEqComp(x0,N(:),tData);
+tData = tensegEqComp(x0,tData);
 
 %% Final Simulation
 tEnd = 10; % Simulation End Time
@@ -73,13 +77,15 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
 [simTime,tInt] = tensegSimTime(options,tEnd);
 
 tData.Correction = 3; % Compressible Bar 
-tic
+
 [linSys,sysSS] = linSysCompDescriptor(x0, tData);
 Asys = linSys.A; Bsys = linSys.Bu; 
 Csys = linSys.C; Dsys = linSys.D;
 % [tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
 minSys = minreal(sysSS);% [tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
-compTimeFlex = toc
+Amin = minSys.A;
+szAmin = size(Amin)
+rAmin = rank(Amin)
 %% Plotting 
 % Plot Output Trajectories
 % plotMotion(tFlex, yFlex, tData);

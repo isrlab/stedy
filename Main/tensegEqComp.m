@@ -1,4 +1,4 @@
-function tData = tensegEqComp(x0,x,tData)
+function tData = tensegEqComp(x,tData)
 % /* This Source Code Form is subject to the terms of the Mozilla Public
 % * License, v. 2.0. If a copy of the MPL was not distributed with this
 % * file, You can obtain one at http://mozilla.org/MPL/2.0/. 
@@ -29,6 +29,10 @@ function tData = tensegEqComp(x0,x,tData)
 % 
 
 %% Construct gradR
+ns = numel(x)/2; % No. of position/velocity variables
+q = x(1:ns); % Position vector
+qd = x(ns+1:end); % Velocity vector
+
 nLC = size(tData.Lin.A,1); % Number of linear constraints
 % nNLC = numel(tData.NLin); % Number of non-linear constraints
 nConstr = nLC;% + nNLC;
@@ -44,17 +48,42 @@ gradLin = tData.Lin.A; % linear constraint,
 gradR = [gradLin];%;gradNLin];
 
 %% Setting up linear programming problem
-n = numel(x);
-Y = cell2mat(tData.Y);
-X = cell2mat(tData.X);
-L1 = reshape(Y'*x, n, tData.nStr);
-L2 = -reshape(X'*x, n, tData.nBar); % - (minus) for compression
-
 % Equilibrium equation for dynamics with compressible bars 
-% (eqn. 56) with qd and qdd terms removed.
+% (eqn. 56) with qdd terms removed.
+Mdot = zeros(size(tData.M));
+Mf = Mdot;
+Mq = Mdot;
 Xq = zeros(size(tData.M));
-beq = zeros(size(Xq.'*x));
-% bars = tData.bars;
+beq = zeros(size(Xq.'*q));
+
+bars = tData.bars;
+for k=1:tData.nBar
+    Xk = tData.listX{k};
+    X = tData.X;
+    mbk = bars.listM(k); % Mass of bar k
+    Ibk = bars.listI(k); % Inertia of bar k
+    bk = Xk*q; % Bar k in vector form
+    rk = bars.r(k); % Radius of bar k
+    lbk = norm(Xk*q); % Length of bar k
+    
+    lbkdot = bk.'*Xk*qd/lbk;
+    rkdot = -bars.nu(k)*rk*lbkdot/lbk;
+    Ibkdot = mbk/12*(6*rk*rkdot + 2*lbk*lbkdot);
+    
+    
+    tempMdot = -2*Ibk/lbk^3*(X{k})*lbkdot + Ibkdot/(lbk^2)*(X{k});
+    tempMf = Ibk*X{k}*lbkdot/lbk^3;
+    tempMq = -(Ibkdot*(X{k})*lbkdot/lbk^3 ...
+             - 3*(Ibk*(X{k}))/(lbk^4)*(lbkdot^2) ...
+             + (qd.'*(X{k})*q/lbk - q.'*(X{k})*qd*lbkdot/lbk^2)*(Ibk*(X{k}))/lbk^3);
+    
+    Mdot = Mdot + tempMdot;
+    Mf = Mf + tempMf;
+    Mq = Mq + tempMq;
+
+end
+Mqd = Mdot - Mf;
+%% bars = tData.bars;
 % alpha = cell(1,tData.nBar);
 % lb = zeros(tData.nBar,1);
 % for k=1:tData.nBar
@@ -71,12 +100,18 @@ beq = zeros(size(Xq.'*x));
 % %     Xq = Xq + tempXq;
 % end
 % alphaK = cell2mat(alpha);
+
+%% Solving 
+Y = cell2mat(tData.Y);
+X = cell2mat(tData.X);
+L1 = reshape(Y'*q, ns, tData.nStr);
+L2 = -reshape(X'*q, ns, tData.nBar); % - (minus) for compression
 Aeq = [L1 L2 -gradR'];
 % beq = Xq.'*x;
 
 if(tData.F)
     run('extF_eq');
-    beq = beq + tData.G + extF;
+    beq = beq + tData.G + extF - Mq.'*q - Mqd.'*qd;
 else beq = beq + tData.G;
 end
 
@@ -102,7 +137,7 @@ fprintf('Force Densities in Strings at Equilibrium: \n %s \n',textSprFD)
 fprintf('Force Densities in Bars at Equilibrium: \n %s \n',textBarFD)
 
 
-lhs = kron(sigma.',eye(n))*Y.'*x - kron(psi.',eye(n))*X.'*x ...
+lhs = kron(sigma.',eye(ns))*Y.'*q - kron(psi.',eye(ns))*X.'*q ...
         - gradR.'*lamb;
 rhs = beq;    
 %% Computing Total Energy in Structure at Equilibrium

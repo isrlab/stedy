@@ -15,7 +15,7 @@ N2 = [10*cos(theta) 15*cos(theta) 15*cos(theta) 10*cos(theta);
                   0             0             0             0;
                   0             0  5*sin(theta)  5*sin(theta);];
 N = [N1 N2];              
-fixedNodes1 = [1 1 1;1 1 1; 0 1 0; 0 1 0;]; % To identify which coordinates of a node are fixed: 1-fixed, 0-unfixed
+fixedNodes1 = [1 1 0;1 1 0; 0 1 0; 0 1 0;]; % To identify which coordinates of a node are fixed: 1-fixed, 0-unfixed
                                             % Same size as N
 fixedNodes2 = fixedNodes1;
 fixedNodes = [fixedNodes1; fixedNodes2]';
@@ -46,7 +46,11 @@ Cs(10,5) = -1; Cs(10,8) = 1;
 tData = tensegConstruct(N,Cb,Cs,fixedNodes);
 
 % Vector of Initial Nodal Positions and Velocities
-x0 = [N(:); 0*N(:)];
+v0 = [0 0 0 0 0 0 0 0;
+      0 0 0 0 0 0 0 0;
+      1 1 1 1 1 1 1 1;];
+x0 = [N(:); v0(:);];
+x0 = [N(:);0*N(:)];
 
 %% Material and Simulation Environment properties
 % Strings
@@ -55,16 +59,16 @@ strings.E = 7e7*ones(1,tData.nStr); % Young's Modulus of Nylon
 strings.rLP = ones(1,tData.nStr);  % Rest lengths of the strings: 0.7 means 70% 
 
 % % Bars (Soft)
-% bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
-% bars.rho = 960*ones(1,tData.nBar); % Density of bars
-% bars.nu = 0.46*ones(1,tData.nBar); % Poisson's ratio of bars (HDPE)
-% bars.E = 1e9*ones(1,tData.nBar); % Young's modulus of bars (HDPE)
+bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
+bars.rho = 960*ones(1,tData.nBar); % Density of bars
+bars.nu = 0.46*ones(1,tData.nBar); % Poisson's ratio of bars (HDPE)
+bars.E = 1e9*ones(1,tData.nBar); % Young's modulus of bars (HDPE)
 
 % Bars (Metallic)
-bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
-bars.rho = 500*ones(1,tData.nBar); % Density of bars
-bars.nu = 0.30*ones(1,tData.nBar); % Poisson's ratio of bars (aluminium)
-bars.E = 200e9*ones(1,tData.nBar); % Young's modulus of bars
+bars.r(end) = 0.05; % Radius of bars
+bars.rho(end) = 2700; % Density of bars
+bars.nu(end) = 0.30; % Poisson's ratio of bars (aluminium)
+bars.E(end) = 200e9; % Young's modulus of bars
 
 % Point Masses
 Mp = ones(1,tData.nPm); % All point masses initialised with a mass of 1
@@ -78,7 +82,9 @@ tData = tensegGenMat(tData,bars,strings,Mp,g);
 
 %% Simulation Inputs
 tData.F = 0; % If 1, external forces are present in structure, not if 0.
-tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
+% tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
+tData.minforce = 1; % Lower bound for force densities in the strings
+tData = tensegEqComp(x0,tData);
 
 %% Final Simulation
 % tEnd = 10; % Simulation End Time
@@ -90,20 +96,26 @@ options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
 % [simTime,tInt] = tensegSimTime(options,tEnd);
 
 tData.Correction = 3; % Compressible Bar 
-tic
+% tic
 [linSys,sysSS] = linSysCompDescriptor(x0, tData);
 Asys = linSys.A; Bsys = linSys.Bu; 
 Csys = linSys.C; Dsys = linSys.D;
 % [tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
 minSys = minreal(sysSS);
-compTimeFlex = toc
+Amin = minSys.A;
+szAmin = size(Amin)
+rMin = rank(Amin)
+e = eig(Amin)
+maxE = max(abs(e))
+nnzE = nnz(abs(e)>1e-5)
+
 %% Plotting 
 % Plot Configuration
-AZ = 0; % Azimuth angle in degrees
-EL = 0; % Elevation angle in degrees
-axLims = [-20 20 -6 6 -20 20]; % Axis Limits in the figure window
-
-plot_configuration(N(:),tData,AZ,EL,axLims);
+% AZ = 0; % Azimuth angle in degrees
+% EL = 0; % Elevation angle in degrees
+% axLims = [-20 20 -6 6 -20 20]; % Axis Limits in the figure window
+% 
+% plot_configuration(N(:),tData,AZ,EL,axLims);
 % Plot Output Trajectories
 % plotMotion(tFlex, yFlex, tData);
 
