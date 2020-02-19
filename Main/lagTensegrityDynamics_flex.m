@@ -41,7 +41,9 @@ Mf = Mdot;
 Mq = Mdot;
 Xq = Mdot;
 bars = tData.bars;
+psi_k = zeros(tData.nBar,1);
 for k=1:tData.nBar
+    X = tData.X;
     Xk = tData.listX{k};
     mbk = bars.listM(k); % Mass of bar k
     Ibk = bars.listI(k); % Inertia of bar k
@@ -61,7 +63,8 @@ for k=1:tData.nBar
              - 3*(Ibk*(Xk.'*Xk))/(lbk^4)*(lbkdot^2) ...
              + (qd.'*(Xk.'*Xk)*q/lbk - q.'*(Xk.'*Xk)*qd*lbkdot/lbk^2)*(Ibk*(Xk.'*Xk))/lbk^3);
     tempMqdd = -Ibk*(Xk.'*Xk)*q*q.'*(Xk.'*Xk)/lbk^4;
-    tempXq = Kbk*((Xk.'*Xk) - (Xk.'*Xk)*lbk0/lbk);
+    psi_k(k) = Kbk*(1 - lbk0/lbk);
+    tempXq = Kbk*(X{k} - X{k}*lbk0/lbk);
     
     Mdot = Mdot + tempMdot;
     Mf = Mf + tempMf;
@@ -69,6 +72,7 @@ for k=1:tData.nBar
     Mqdd = Mqdd + tempMqdd;
     Xq = Xq + tempXq;
 end
+Bar_En = -kron(psi_k',eye(ns))*(cell2mat(tData.X))'*q;
 Mqd = Mdot - Mf;
 
 
@@ -101,7 +105,7 @@ else
 end
     
 if(tData.nStr>0) % If strings present in structure
-    F1_qdd = Cab_En - Mq.'*q - Xq.'*q - Mqd.'*qd + tData.G + extF + Fd;
+    F1_qdd = Cab_En - Mq.'*q + Bar_En - Mqd.'*qd + tData.G + extF + Fd;
     F1 = [F1_qdd;hessR]; % No gravity
 else
     F1 = [tData.G+extF + Fd;hessR];
