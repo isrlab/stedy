@@ -50,32 +50,38 @@ strings.rLP = ones(1,tData.nStr);  % Rest lengths of the strings: 0.7 means 70%
 % strings.rLP = [1 0.7 1 0.7];  % Rest lengths of the strings: 0.7 means 70% 
 
 % Bars
-bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
-bars.rho = 960*ones(1,tData.nBar); % Density of bars
-bars.nu = 0.46*ones(1,tData.nBar); % Poisson's ratio of bars (HDPE)
-bars.E = 1e9*ones(1,tData.nBar); % Young's modulus of bars (HDPE)
+barsSoft.r = 0.05*ones(1,tData.nBar); % Radius of bars
+barsSoft.rho = 960*ones(1,tData.nBar); % Density of bars
+barsSoft.nu = 0.46*ones(1,tData.nBar); % Poisson's ratio of bars (HDPE)
+barsSoft.E = 1e9*ones(1,tData.nBar); % Young's modulus of bars (HDPE)
 
-% bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
-% bars.rho = 2700*ones(1,tData.nBar); % Density of bars
-% bars.nu = 0.30*ones(1,tData.nBar); % Poisson's ratio of bars (aluminium)
-% bars.E = 200e9*ones(1,tData.nBar); % Young's modulus of bars
+barsMetal.r = 0.05*ones(1,tData.nBar); % Radius of bars
+barsMetal.rho = 2700*ones(1,tData.nBar); % Density of bars
+barsMetal.nu = 0.30*ones(1,tData.nBar); % Poisson's ratio of bars (aluminium)
+barsMetal.E = 200e9*ones(1,tData.nBar); % Young's modulus of bars
 
 % Point Masses
 Mp = ones(1,tData.nPm); % All point masses initialised with a mass of 1
 
 g = [0;0;0]; % Gravity
 
-tData = tensegGenMat(tData,bars,strings,Mp,g);
+tData = tensegGenMat(tData,barsSoft,strings,Mp,g);
+tDataRigid = tensegGenMat(tData,barsMetal,strings,Mp,g);
 
 % The structure is in equilibrium in the initial position. Hence, there
 % is no need to call the function tensegEq.
 
 %% Simulation Inputs
 tData.F = 0; % If 1, external forces are present in structure, not if 0.
+tDataRigid.F = 0;
 tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
-tData.minforce = 1; % Lower bound for force densities in the strings
+tDataRigid.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
+tData.minforce = 0; % Lower bound for force densities in the strings
+tDataRigid.minforce = 0; % Lower bound for force densities in the strings
 tData = tensegEqComp(x0,tData);
-tDataRigid = tensegEq(x0,N(:),tData);
+tData.Compressible = 1;
+tDataRigid = tensegEqComp(x0,tDataRigid);
+tDataRigid.Compressible = 1;
 %% Checking genOptK
 ns = numel(N);
 nC = nnz(fixedNodes);
@@ -86,7 +92,7 @@ X = cell2mat(tData.X);
 
 Ksys = genKsys(x0,tData);
 % KsysRigid = kron(tDataRigid.sigmaEq.',eye(ns))*Y.'; 
-    
+KsysRigid = genKsys(x0,tDataRigid);    
 %% Removing constrained rows and columns
 % 1st, 2nd nodes are constrained in x,y,z.
 % 3rd and 4th nodes are constrained in y. 
@@ -94,7 +100,7 @@ Ksys = genKsys(x0,tData);
 W = zeros(ns,ns-nC);
 W(7,1) = 1; W(9,2) = 1; W(10,3) = 1; W(12,4) = 1;
 Kred = W.'*Ksys*W;
-
+KredRigid = W.'*KsysRigid*W;
 % % % % % % % % Krem = Ksys;
 % % % % % % % % Krem(1,:) = []; Krem(:,1) = [];
 % % % % % % % % Krem(1,:) = []; Krem(:,1) = [];
@@ -108,10 +114,16 @@ Kred = W.'*Ksys*W;
 %% Deflection
 s = svd(Kred);    
 [U,~,V] = svd(Kred);
+sRigid = svd(KredRigid);
+[Urigid,~,Vrigid] = svd(KredRigid);
+
 % ind = find(s > 1e-12);
 OneByK = zeros(ns-nC,ns-nC);
+OneByKRigid = zeros(ns-nC,ns-nC);
 for i = 1:length(s)
    OneByK = OneByK + 1/s(i)*V(:,i)*(U(:,i).');
+   OneByKRigid = OneByKRigid + ...
+                   1/sRigid(i)*Vrigid(:,i)*(Urigid(:,i).');
 end
 Fext = ones(ns-nC,1);
 Fext(1) = 0; Fext(3) = 0; Fext(4) = 0;
@@ -119,6 +131,7 @@ Fext(1) = 0; Fext(3) = 0; Fext(4) = 0;
 % Fext(3) = 0; Fext(6) = 0; Fext(8) = 10; Fext(11) = 10;
 % Fext(3) = 0; Fext(6) = 0; Fext(7) = 10; Fext(10) = 10;
 deltx = OneByK*Fext
+deltxRigid = OneByKRigid*Fext
 
 % KsysNew = Ksys; 
 % % KsysNew(3,:) = 2*Ksys(3,:); KsysNew(:,3) = 2*Ksys(:,3); 
@@ -161,13 +174,13 @@ rAmin = rank(Amin)
 % unco = length(minSys.A) - rank(Co)
 
 % Using ctrbf to get the controllable subspace
-[Abar,Bbar,Cbar,T,k] = ctrbf(sysSS.A,sysSS.B,sysSS.C);
-nCntrlSt = sum(k);
-Ac = Abar(end - nCntrlSt + 1: end, end - nCntrlSt + 1: end);
-Bc = Bbar(end - nCntrlSt + 1: end, :);
-nsCntrl = size(Ac,1);
-nuCntrl = size(Bc,2);
-ns = numel(N);
+% [Abar,Bbar,Cbar,T,k] = ctrbf(sysSS.A,sysSS.B,sysSS.C);
+% nCntrlSt = sum(k);
+% Ac = Abar(end - nCntrlSt + 1: end, end - nCntrlSt + 1: end);
+% Bc = Bbar(end - nCntrlSt + 1: end, :);
+% nsCntrl = size(Ac,1);
+% nuCntrl = size(Bc,2);
+% ns = numel(N);
 % nu = tData.nStr + tData.nBar;
 % nsMin = size(minSys.A,1); nuMin = size(minSys.B,2);
 
@@ -247,21 +260,23 @@ ns = numel(N);
 % plot(tSim, ySim(:,1));
 % [K,S,E] = lqr(minSys,Q,R,Nlqr);
 %% Checking Linear Model against Nonlinear
-x0delt = x0;%(1:end-1);
-T = 0:0.01:1;
-x0delt(9) = x0delt(9) + 0.5*rand(1);
+x0delt = zeros(size(x0));%(1:end-1);
+T = 0:0.01:0.2;
+x0delt(9) = 0.1*rand(1);
 [tSim,ySim] = ode15s(@linearlagTensegrityDynamics_flex,T,x0delt,options,tData);
-% [ysim,tsim,xsim] = lsim(sysSS,zeros(length(T),6),T,x0delt);
-% plot(tSim,ySim(:,12));
-[tFlex,yFlex] = tensegSim(x0delt,T,tData,options);
-
+% % [ysim,tsim,xsim] = lsim(sysSS,zeros(length(T),6),T,x0delt);
+% % plot(tSim,ySim(:,12));
+[tFlex,yFlex] = tensegSim(x0delt+x0,T,tData,options);
+for i=1:length(tSim)
+    ySim(i,:) = ySim(i,:) + x0(1:end)';
+end
 %% Plotting 
 % Plot Output Trajectories
-% plotMotion(tFlex, yFlex, tData);
-% plotMotion(tSim, ySim, tData);
+plotMotion(tFlex, yFlex, tData);
+plotMotion(tSim, ySim, tData);
 
 % Overlay Motion Plots
-% plotCompTbar_flex(tSim,ySim,tFlex,yFlex,tData);
+plotCompTbar_flex(tSim,ySim,tFlex,yFlex,tData);
 
 % print(figure(3),'compTBarFlex_MotionNode3','-depsc');
 % print(figure(4),'compTBarFlex_MotionNode4','-depsc');
