@@ -1,4 +1,4 @@
-function xdot = linearlagTensegrityDynamics_flex(t,x,tData)
+function dxdot = linearlagTensegrityDynamics_flex(t,x,tData)
 % This Source Code Form is subject to the terms of the Mozilla Public
 % License, v. 2.0. If a copy of the MPL was not distributed with this
 % file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -8,8 +8,10 @@ function xdot = linearlagTensegrityDynamics_flex(t,x,tData)
 % 
 
 ns = (numel(x)-1)/2; % No. of position/velocity variables
-q = x(1:ns); % Position vector
-qd = x(ns+1:end-1); % Velocity vector
+q0 = tData.N(:);
+qd0 = zeros(ns,1);
+q = x(1:ns) + q0; % Position vector
+qd = x(ns+1:end-1) + qd0; % Velocity vector
 
 Forces = tData.G; % Initializing with gravitational force
 Fd = zeros(ns,1);
@@ -112,8 +114,11 @@ else
 end
 
 A = tData.sysSS.A; B = tData.sysSS.B;
-xdot = A*[q;qd] + B*[sig_k;psi_k];
+dq = q - q0; dqd = qd - qd0;
+dsig_k = sig_k - tData.sigmaEq;
+dpsi_k = psi_k - tData.psiEq;
+dxdot = A*[dq;dqd] + B*[dsig_k;dpsi_k];
 power = (extF'+Fd')*qd;
 
 
-xdot = [xdot;power];
+dxdot = [dxdot;power];
