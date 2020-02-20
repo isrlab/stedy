@@ -55,10 +55,10 @@ bars.rho = 960*ones(1,tData.nBar); % Density of bars
 bars.nu = 0.46*ones(1,tData.nBar); % Poisson's ratio of bars (HDPE)
 bars.E = 1e9*ones(1,tData.nBar); % Young's modulus of bars (HDPE)
 
-bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
-bars.rho = 2700*ones(1,tData.nBar); % Density of bars
-bars.nu = 0.30*ones(1,tData.nBar); % Poisson's ratio of bars (aluminium)
-bars.E = 200e9*ones(1,tData.nBar); % Young's modulus of bars
+% bars.r = 0.05*ones(1,tData.nBar); % Radius of bars
+% bars.rho = 2700*ones(1,tData.nBar); % Density of bars
+% bars.nu = 0.30*ones(1,tData.nBar); % Poisson's ratio of bars (aluminium)
+% bars.E = 200e9*ones(1,tData.nBar); % Young's modulus of bars
 
 % Point Masses
 Mp = ones(1,tData.nPm); % All point masses initialised with a mass of 1
@@ -75,14 +75,17 @@ tData.F = 0; % If 1, external forces are present in structure, not if 0.
 tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
 tData.minforce = 1; % Lower bound for force densities in the strings
 tData = tensegEqComp(x0,tData);
-
+tDataRigid = tensegEq(x0,N(:),tData);
 %% Checking genOptK
 ns = numel(N);
 nC = nnz(fixedNodes);
 Y = cell2mat(tData.Y);
 X = cell2mat(tData.X);
-Ksys = kron(tData.sigmaEq.',eye(ns))*Y.' ...
-        + kron(tData.psiEq.',eye(ns))*X.';
+% Ksys = kron(tData.sigmaEq.',eye(ns))*Y.' ...
+%         + kron(tData.psiEq.',eye(ns))*X.';
+
+Ksys = genKsys(x0,tData);
+% KsysRigid = kron(tDataRigid.sigmaEq.',eye(ns))*Y.'; 
     
 %% Removing constrained rows and columns
 % 1st, 2nd nodes are constrained in x,y,z.
@@ -146,10 +149,10 @@ tData.Correction = 3; % Compressible Bar
 tData.sysSS = sysSS;
 
 %% Minreal
-% minSys = minreal(sysSS);%,10);
-% Amin = minSys.A;
-% szAmin = size(Amin)
-% rAmin = rank(Amin)
+minSys = minreal(sysSS);%,10);
+Amin = minSys.A;
+szAmin = size(Amin)
+rAmin = rank(Amin)
 % 
 % % [balSys,g] = balreal(sysSS)
 % % rSys = balred(sysSS,szAmin(1))
@@ -191,66 +194,66 @@ ns = numel(N);
 % % % %                     sysSS.C, zeros(2*ns,ns));   
     
 %% LQR
-Q = 1e-2*eye(nsCntrl);
-R = eye(nuCntrl);
-
-[Klqr,S,E] = lqr(Ac,Bc,Q,R);
-% % % % [KlqrDist,S,E] = lqr(Ac,Bc,Cz.'*Cz,Du.'*Du);
-Kaug = [zeros(nuCntrl, length(Abar) - nsCntrl) Klqr];
-Ktrlqr = Kaug*T;
-syslqr = ss(sysSS.A - sysSS.B*Ktrlqr,zeros(size(sysSS.B)),...
-                    sysSS.C, sysSS.D);
-% % % % sqslqrDist = ss(sysSS.A - sysSS.B*Ktrlqr,Bf,...
+% Q = 1e-2*eye(nsCntrl);
+% R = eye(nuCntrl);
+% 
+% [Klqr,S,E] = lqr(Ac,Bc,Q,R);
+% % % % % [KlqrDist,S,E] = lqr(Ac,Bc,Cz.'*Cz,Du.'*Du);
+% Kaug = [zeros(nuCntrl, length(Abar) - nsCntrl) Klqr];
+% Ktrlqr = Kaug*T;
+% syslqr = ss(sysSS.A - sysSS.B*Ktrlqr,zeros(size(sysSS.B)),...
+%                     sysSS.C, sysSS.D);
+% % % % % sqslqrDist = ss(sysSS.A - sysSS.B*Ktrlqr,Bf,...
 % % % %                     sysSS.C, sysSS.D);
 %% Sim                
-tSim = (0:0.01:100)';
-x0Sim = zeros(2*ns,1);
-x0Sim(9) = 0.1*rand(1);
-x0Sim(12) = 0.05*rand(1);
-% uSim = 0.1*rand(12,length(tSim));
-[ySim, tSim, xSim] =  ...
-    lsim(syslqr,zeros(nuCntrl,length(tSim)),tSim,x0Sim);
+% tSim = (0:0.01:100)';
+% x0Sim = zeros(2*ns,1);
+% x0Sim(9) = 0.1*rand(1);
+% x0Sim(12) = 0.05*rand(1);
+% % uSim = 0.1*rand(12,length(tSim));
 % [ySim, tSim, xSim] =  ...
-%     lsim(sysH2,uSim,tSim,x0Sim);
-uSim = zeros(length(tSim),nuCntrl);
-for i=1:length(tSim)
-    uSim(i,:) = Ktrlqr*xSim(i,:)';
-end
+%     lsim(syslqr,zeros(nuCntrl,length(tSim)),tSim,x0Sim);
+% % [ySim, tSim, xSim] =  ...
+% %     lsim(sysH2,uSim,tSim,x0Sim);
+% uSim = zeros(length(tSim),nuCntrl);
+% for i=1:length(tSim)
+%     uSim(i,:) = Ktrlqr*xSim(i,:)';
+% end
 %% Plot
-close all;
-figure(1); clf;
-subplot(4,1,1); plot(tSim, ySim(:,7));title('Position'); ylabel('3x');
-subplot(4,1,2); plot(tSim, ySim(:,9)); ylabel('3z');
-subplot(4,1,3); plot(tSim, ySim(:,10)); ylabel('4x');
-subplot(4,1,4); plot(tSim, ySim(:,12)); ylabel('4z'); xlabel('Time(s)');
-
-figure(2); clf;
-subplot(4,1,1); plot(tSim, ySim(:,19)); title('Velocity'); ylabel('3x');
-subplot(4,1,2); plot(tSim, ySim(:,21)); ylabel('3z');
-subplot(4,1,3); plot(tSim, ySim(:,22)); ylabel('4x');
-subplot(4,1,4); plot(tSim, ySim(:,24)); ylabel('4z'); xlabel('Time(s)');
-
-figure(3); clf;
-subplot(4,1,1); plot(tSim, uSim(:,1));title('Cable FD'); ylabel('s1');
-subplot(4,1,2); plot(tSim, uSim(:,2)); ylabel('s2');
-subplot(4,1,3); plot(tSim, uSim(:,3)); ylabel('s3');
-subplot(4,1,4); plot(tSim, uSim(:,4)); ylabel('s4'); xlabel('Time(s)');
-
-figure(4); clf;
-subplot(2,1,1); plot(tSim, uSim(:,5));title('Bar FD'); ylabel('b1');
-subplot(2,1,2); plot(tSim, uSim(:,6)); ylabel('b2');xlabel('Time(s)');
+% close all;
+% figure(1); clf;
+% subplot(4,1,1); plot(tSim, ySim(:,7));title('Position'); ylabel('3x');
+% subplot(4,1,2); plot(tSim, ySim(:,9)); ylabel('3z');
+% subplot(4,1,3); plot(tSim, ySim(:,10)); ylabel('4x');
+% subplot(4,1,4); plot(tSim, ySim(:,12)); ylabel('4z'); xlabel('Time(s)');
+% 
+% figure(2); clf;
+% subplot(4,1,1); plot(tSim, ySim(:,19)); title('Velocity'); ylabel('3x');
+% subplot(4,1,2); plot(tSim, ySim(:,21)); ylabel('3z');
+% subplot(4,1,3); plot(tSim, ySim(:,22)); ylabel('4x');
+% subplot(4,1,4); plot(tSim, ySim(:,24)); ylabel('4z'); xlabel('Time(s)');
+% 
+% figure(3); clf;
+% subplot(4,1,1); plot(tSim, uSim(:,1));title('Cable FD'); ylabel('s1');
+% subplot(4,1,2); plot(tSim, uSim(:,2)); ylabel('s2');
+% subplot(4,1,3); plot(tSim, uSim(:,3)); ylabel('s3');
+% subplot(4,1,4); plot(tSim, uSim(:,4)); ylabel('s4'); xlabel('Time(s)');
+% 
+% figure(4); clf;
+% subplot(2,1,1); plot(tSim, uSim(:,5));title('Bar FD'); ylabel('b1');
+% subplot(2,1,2); plot(tSim, uSim(:,6)); ylabel('b2');xlabel('Time(s)');
 
 % figure();clf
 % plot(tSim, ySim(:,1));
 % [K,S,E] = lqr(minSys,Q,R,Nlqr);
 %% Checking Linear Model against Nonlinear
-% x0delt = x0;%(1:end-1);
-% T = 0:0.01:1;
-% x0delt(9) = x0delt(9) + 0.5*rand(1);
-% [tSim,ySim] = ode15s(@linearlagTensegrityDynamics_flex,T,x0delt,options,tData);
-% % [ysim,tsim,xsim] = lsim(sysSS,zeros(length(T),6),T,x0delt);
-% % plot(tSim,ySim(:,12));
-% [tFlex,yFlex] = tensegSim(x0delt,T,tData,options);
+x0delt = x0;%(1:end-1);
+T = 0:0.01:1;
+x0delt(9) = x0delt(9) + 0.5*rand(1);
+[tSim,ySim] = ode15s(@linearlagTensegrityDynamics_flex,T,x0delt,options,tData);
+% [ysim,tsim,xsim] = lsim(sysSS,zeros(length(T),6),T,x0delt);
+% plot(tSim,ySim(:,12));
+[tFlex,yFlex] = tensegSim(x0delt,T,tData,options);
 
 %% Plotting 
 % Plot Output Trajectories

@@ -149,11 +149,9 @@ Yhat = reshape(YTq,[ns,tData.nStr]);
 XTq = cell2mat(tData.X).'*q;
 Xhat = reshape(XTq,[ns,tData.nBar]);
 
-
+Ksys = genKsys(x,tData);
 % xi3 = Cab_En - Mq.'*q - Xq.'*q - Mqd.'*qd + tData.G + extF + Fd;
-dxi3_dq = -(Mq.' + kron(psi_k',eye(ns))*(cell2mat(tData.X))' + ...
-            kron(sig_k',eye(ns))*(cell2mat(tData.Y))')...
-            - dMqd_dqxqd + dFd_dq; 
+dxi3_dq = -(Mq.' + Ksys) - dMqd_dqxqd + dFd_dq; 
 dxi3_dqd = -dMq_dqdxq - Mqd.' - dMqd_dqdxqd + dFd_dqd;
 dxi3_dsigma = -Yhat;
 dxi3_dpsi = -Xhat;
