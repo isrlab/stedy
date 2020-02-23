@@ -4,7 +4,7 @@
 % 
 % To compare Tbar w/o correction against Tbar_flex.
 clc; clear;
-close all;
+% close all;
 %% Define initial nodal coordinates and connectivity matrices
 theta = pi/4; % To help describe angular position of any node
 
@@ -45,7 +45,7 @@ x0 = [N(:); 0*N(:)];
 %% Material and Simulation Environment properties
 % Strings
 strings.r = 1/1000*ones(1,tData.nStr); % Radius of strings
-strings.E = 7e7*ones(1,tData.nStr); % Young's Modulus of Nylon
+strings.E = 2E9*ones(1,tData.nStr); % Young's Modulus of Nylon
 strings.rLP = ones(1,tData.nStr);  % Rest lengths of the strings: 0.7 means 70% 
 % strings.rLP = [1 0.7 1 0.7];  % Rest lengths of the strings: 0.7 means 70% 
 
@@ -60,6 +60,10 @@ barsMetal.rho = 2700*ones(1,tData.nBar); % Density of bars
 barsMetal.nu = 0.30*ones(1,tData.nBar); % Poisson's ratio of bars (aluminium)
 barsMetal.E = 200e9*ones(1,tData.nBar); % Young's modulus of bars
 
+% barsNylon.r = 0.05*ones(1,tData.nBar); % Radius of bars
+% barsNylon.rho = 1150*ones(1,tData.nBar); % Density of bars (Nylon 6)
+% barsNylon.nu = 0.46*ones(1,tData.nBar); % Poisson's ratio of bars (HDPE)
+% barsNylon.E = 1e9*ones(1,tData.nBar); % Young's modulus of bars (HDPE)
 % Point Masses
 Mp = ones(1,tData.nPm); % All point masses initialised with a mass of 1
 
@@ -72,12 +76,12 @@ tDataRigid = tensegGenMat(tData,barsMetal,strings,Mp,g);
 % is no need to call the function tensegEq.
 
 %% Simulation Inputs
-tData.F = 0; % If 1, external forces are present in structure, not if 0.
-tDataRigid.F = 0;
-tData.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
-tDataRigid.damper = ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
-tData.minforce = 0; % Lower bound for force densities in the strings
-tDataRigid.minforce = 0; % Lower bound for force densities in the strings
+tData.F = 1; % If 1, external forces are present in structure, not if 0.
+tDataRigid.F = 1;
+tData.damper = 100*ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
+tDataRigid.damper = 100*ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
+tData.minforce = 20; % Lower bound for force densities in the strings
+tDataRigid.minforce = 20; % Lower bound for force densities in the strings
 tData = tensegEqComp(x0,tData);
 tData.Compressible = 1;
 tDataRigid = tensegEqComp(x0,tDataRigid);
@@ -101,37 +105,42 @@ W = zeros(ns,ns-nC);
 W(7,1) = 1; W(9,2) = 1; W(10,3) = 1; W(12,4) = 1;
 Kred = W.'*Ksys*W;
 KredRigid = W.'*KsysRigid*W;
-% % % % % % % % Krem = Ksys;
-% % % % % % % % Krem(1,:) = []; Krem(:,1) = [];
-% % % % % % % % Krem(1,:) = []; Krem(:,1) = [];
-% % % % % % % % Krem(1,:) = []; Krem(:,1) = [];
-% % % % % % % % Krem(1,:) = []; Krem(:,1) = [];
-% % % % % % % % Krem(1,:) = []; Krem(:,1) = [];
-% % % % % % % % Krem(1,:) = []; Krem(:,1) = [];
-% % % % % % % % Krem(2,:) = []; Krem(:,2) = [];
-% % % % % % % % Krem(4,:) = []; Krem(:,4) = [];
 
-%% Deflection
-s = svd(Kred);    
-[U,~,V] = svd(Kred);
-sRigid = svd(KredRigid);
-[Urigid,~,Vrigid] = svd(KredRigid);
+%% Compliance Matrix and Total Mass
+Cred = inv(Kred); ecRed = eig(Cred);
+CredRigid = inv(KredRigid); ecRedRigid = eig(CredRigid);
+ex = 1:length(ecRed);
+% scatter(ex, ecRed); hold on;
+% scatter(ex, ecRedRigid);
 
-% ind = find(s > 1e-12);
-OneByK = zeros(ns-nC,ns-nC);
-OneByKRigid = zeros(ns-nC,ns-nC);
-for i = 1:length(s)
-   OneByK = OneByK + 1/s(i)*V(:,i)*(U(:,i).');
-   OneByKRigid = OneByKRigid + ...
-                   1/sRigid(i)*Vrigid(:,i)*(Urigid(:,i).');
+mTotalSoft = 0; mTotalRigid = 0;
+for k=1:tData.nBar
+   mTotalSoft = mTotalSoft + tData.bars.listM(k);
+   mTotalRigid = mTotalRigid + tDataRigid.bars.listM(k);
 end
-Fext = ones(ns-nC,1);
-Fext(1) = 0; Fext(3) = 0; Fext(4) = 0;
+mTotalSoft
+mTotalRigid
+%% Deflection
+% s = svd(Kred);    
+% [U,~,V] = svd(Kred);
+% sRigid = svd(KredRigid);
+% [Urigid,~,Vrigid] = svd(KredRigid);
+% 
+% % ind = find(s > 1e-12);
+% OneByK = zeros(ns-nC,ns-nC);
+% OneByKRigid = zeros(ns-nC,ns-nC);
+% for i = 1:length(s)
+%    OneByK = OneByK + 1/s(i)*V(:,i)*(U(:,i).');
+%    OneByKRigid = OneByKRigid + ...
+%                    1/sRigid(i)*Vrigid(:,i)*(Urigid(:,i).');
+% end
+Fext = 100*ones(ns-nC,1);
+Fext(1) = 0; Fext(3) = 0; %Fext(4) = 0;
 % Fext(3) = 0; Fext(6) = 0; Fext(9) = 10; Fext(12) = 10;
 % Fext(3) = 0; Fext(6) = 0; Fext(8) = 10; Fext(11) = 10;
 % Fext(3) = 0; Fext(6) = 0; Fext(7) = 10; Fext(10) = 10;
-deltx = OneByK*Fext
-deltxRigid = OneByKRigid*Fext
+deltx = Cred*Fext
+deltxRigid = CredRigid*Fext
 
 % KsysNew = Ksys; 
 % % KsysNew(3,:) = 2*Ksys(3,:); KsysNew(:,3) = 2*Ksys(:,3); 
@@ -151,21 +160,75 @@ tEnd = 10; % Simulation End Time
 
 x0 = [x0;0]; % Initial Condition - [Position; Velocity; Energy];
 
-options = odeset('RelTol',1e-10,'AbsTol',1e-10,'Refine',1);
+options = odeset('RelTol',1e-10,'AbsTol',1e-10);%,'Refine',1);
 
-% [simTime,tInt] = tensegSimTime(options,tEnd);
+[simTime,tInt] = tensegSimTime(options,tEnd);
 
 tData.Correction = 3; % Compressible Bar 
-% [tFlex,yFlex] = tensegSim(x0,simTime,tData,options);
+tDataRigid.Correction = 3; % Compressible Bar 
+x0Sim = x0;
+% x0Sim(9) = x0Sim(9) + 0.1*rand(1);
+% x0Sim(12) = 0.1*rand(1);
+%% Checking for H2
+extF = zeros(ns,length(simTime));
+for t=1:length(simTime)
+    extF(:,t) = [zeros(8,1);100*rand(1);zeros(3,1)];
+end
+tData.extF = extF;
+tDataRigid.extF = extF;
+[tFlex,yFlex] = tensegSim(x0Sim,simTime,tData,options);
+[tFlexRigid,yFlexRigid] = tensegSim(x0Sim,simTime,tDataRigid,options);
+%% Linearization
 
 [sysSS, Bf] = linSysCompDescriptor(x0, tData);
-tData.sysSS = sysSS;
+[sysSSRigid, BfRigid] = linSysCompDescriptor(x0, tDataRigid);
 
+tData.sysSS = sysSS; tData.Bf = Bf;
+tDataRigid.sysSS  = sysSSRigid; tDataRigid.Bf = BfRigid;
+
+%% Simulate lqr for both soft and metal
+% close all;
+% tSim = (0:0.01:100)';
+% x0Sim = zeros(2*ns,1);
+% x0Sim(9) = 2*rand(1);
+% x0Sim(12) = 2*rand(1);
+% lqrLinSysComp(tData, tSim, x0Sim);
+% lqrLinSysComp(tDataRigid, tSim, x0Sim);
 %% Minreal
+% Getting the stable part of the system
+% sysSSRigid's subset of eigvec matrix not full rank
+% buildStableNorm(sysSS)
+% buildStableNorm(sysSSRigid)
+
 minSys = minreal(sysSS);%,10);
-Amin = minSys.A;
-szAmin = size(Amin)
-rAmin = rank(Amin)
+minSysRigid = minreal(sysSSRigid);
+% figure();
+% pzmap(minSys); hold on;
+% pzmap(minSysRigid);
+
+%% Balred
+% opts = balredOptions;
+% pole(sysSS)
+% opts = balredOptions('StateElimMethod','Truncate', 'Offset',1e-6,...
+%         'AbsTol',1e-6, 'RelTol', 1e-6);
+% bSys = balred(sysSS,18,opts);
+% pole(bSys)
+
+%% stabsep
+opt = stabsepOptions('AbsTol',1e-6,'Offset',1e-6);
+[GS,GNS] = stabsep(sysSS,opt);
+[GSRigid,GNS] = stabsep(sysSSRigid,opt);
+pole(GS)
+pole(GSRigid)
+norm(GS)
+norm(GSRigid)
+% figure();
+% pzmap(GS); hold on;
+% pzmap(GSRigid)
+%%
+% Amin = minSys.A;
+% szAmin = size(Amin)
+% rAmin = rank(Amin)
 % 
 % % [balSys,g] = balreal(sysSS)
 % % rSys = balred(sysSS,szAmin(1))
@@ -173,110 +236,30 @@ rAmin = rank(Amin)
 % Co = ctrb(minSys);
 % unco = length(minSys.A) - rank(Co)
 
-% Using ctrbf to get the controllable subspace
-% [Abar,Bbar,Cbar,T,k] = ctrbf(sysSS.A,sysSS.B,sysSS.C);
-% nCntrlSt = sum(k);
-% Ac = Abar(end - nCntrlSt + 1: end, end - nCntrlSt + 1: end);
-% Bc = Bbar(end - nCntrlSt + 1: end, :);
-% nsCntrl = size(Ac,1);
-% nuCntrl = size(Bc,2);
-% ns = numel(N);
-% nu = tData.nStr + tData.nBar;
-% nsMin = size(minSys.A,1); nuMin = size(minSys.B,2);
 
-%% H2
-% % % % Bw = T*Bf; 
-% % % % Bw= Bw(end - nCntrlSt + 1:end,:);
-% % % % Cz = T(end - nCntrlSt + 1:end,:).';
-% % % % Du = zeros(2*ns,nuCntrl);
-% % % % gam = 1;
-% % % % cvx_begin sdp 
-% % % %     variable X(nsCntrl, nsCntrl) symmetric
-% % % %     variable W(2*ns, 2*ns) symmetric
-% % % %     variable Z(nuCntrl, nsCntrl)
-% % % %     
-% % % %     [Ac Bc]*[X; Z]  + [X Z']*[Ac'; Bc'] + Bw*Bw' <= 0
-% % % %     [W Cz*X; X*Cz' X] >= 0
-% % % %     trace(W) < gam
-% % % %     
-% % % %     minimize trace(W)
-% % % % cvx_end
-% % % % h2K = Z*inv(X);
-% % % % KtrH2 = [zeros(nuCntrl, length(Abar) - nsCntrl) h2K]*T;
-% % % % sysH2 =  ss(sysSS.A - sysSS.B*KtrH2, Bf,...
-% % % %                     sysSS.C, zeros(2*ns,ns));   
     
-%% LQR
-% Q = 1e-2*eye(nsCntrl);
-% R = eye(nuCntrl);
-% 
-% [Klqr,S,E] = lqr(Ac,Bc,Q,R);
-% % % % % [KlqrDist,S,E] = lqr(Ac,Bc,Cz.'*Cz,Du.'*Du);
-% Kaug = [zeros(nuCntrl, length(Abar) - nsCntrl) Klqr];
-% Ktrlqr = Kaug*T;
-% syslqr = ss(sysSS.A - sysSS.B*Ktrlqr,zeros(size(sysSS.B)),...
-%                     sysSS.C, sysSS.D);
-% % % % % sqslqrDist = ss(sysSS.A - sysSS.B*Ktrlqr,Bf,...
-% % % %                     sysSS.C, sysSS.D);
-%% Sim                
-% tSim = (0:0.01:100)';
-% x0Sim = zeros(2*ns,1);
-% x0Sim(9) = 0.1*rand(1);
-% x0Sim(12) = 0.05*rand(1);
-% % uSim = 0.1*rand(12,length(tSim));
-% [ySim, tSim, xSim] =  ...
-%     lsim(syslqr,zeros(nuCntrl,length(tSim)),tSim,x0Sim);
-% % [ySim, tSim, xSim] =  ...
-% %     lsim(sysH2,uSim,tSim,x0Sim);
-% uSim = zeros(length(tSim),nuCntrl);
-% for i=1:length(tSim)
-%     uSim(i,:) = Ktrlqr*xSim(i,:)';
-% end
-%% Plot
-% close all;
-% figure(1); clf;
-% subplot(4,1,1); plot(tSim, ySim(:,7));title('Position'); ylabel('3x');
-% subplot(4,1,2); plot(tSim, ySim(:,9)); ylabel('3z');
-% subplot(4,1,3); plot(tSim, ySim(:,10)); ylabel('4x');
-% subplot(4,1,4); plot(tSim, ySim(:,12)); ylabel('4z'); xlabel('Time(s)');
-% 
-% figure(2); clf;
-% subplot(4,1,1); plot(tSim, ySim(:,19)); title('Velocity'); ylabel('3x');
-% subplot(4,1,2); plot(tSim, ySim(:,21)); ylabel('3z');
-% subplot(4,1,3); plot(tSim, ySim(:,22)); ylabel('4x');
-% subplot(4,1,4); plot(tSim, ySim(:,24)); ylabel('4z'); xlabel('Time(s)');
-% 
-% figure(3); clf;
-% subplot(4,1,1); plot(tSim, uSim(:,1));title('Cable FD'); ylabel('s1');
-% subplot(4,1,2); plot(tSim, uSim(:,2)); ylabel('s2');
-% subplot(4,1,3); plot(tSim, uSim(:,3)); ylabel('s3');
-% subplot(4,1,4); plot(tSim, uSim(:,4)); ylabel('s4'); xlabel('Time(s)');
-% 
-% figure(4); clf;
-% subplot(2,1,1); plot(tSim, uSim(:,5));title('Bar FD'); ylabel('b1');
-% subplot(2,1,2); plot(tSim, uSim(:,6)); ylabel('b2');xlabel('Time(s)');
 
-% figure();clf
-% plot(tSim, ySim(:,1));
-% [K,S,E] = lqr(minSys,Q,R,Nlqr);
 %% Checking Linear Model against Nonlinear
-x0delt = zeros(size(x0));%(1:end-1);
-T = 0:0.01:0.2;
-x0delt(9) = 0.1*rand(1);
-[tSim,ySim] = ode15s(@linearlagTensegrityDynamics_flex,T,x0delt,options,tData);
-% % [ysim,tsim,xsim] = lsim(sysSS,zeros(length(T),6),T,x0delt);
-% % plot(tSim,ySim(:,12));
-[tFlex,yFlex] = tensegSim(x0delt+x0,T,tData,options);
-for i=1:length(tSim)
-    ySim(i,:) = ySim(i,:) + x0(1:end)';
+% x0delt = zeros(size(x0));%(1:end-1);
+% x0delt(9) = 0.1*rand(1);
+% % x0delt = x0; x0delt(9) = x0delt(9) + 0.1*rand(1);
+% T = 0:0.01:1;
+% [tSim,ySim] = ode15s(@linearlagTensegrityDynamics_flex,T,x0delt,options,tData);
+% % % [ysim,tsim,xsim] = lsim(sysSS,zeros(length(T),6),T,x0delt);
+% % % plot(tSim,ySim(:,12));
+% [tFlex,yFlex] = tensegSim(x0delt+x0,T,tData,options);
+for i=1:length(tFlex)
+%     ySim(i,:) = ySim(i,:) + x0(1:end)';
+    yFlex(i,:) = yFlex(i,:) - x0(1:end)'; % Comparing against eq
+    yFlexRigid(i,:) = yFlexRigid(i,:) - x0(1:end)'; % Comparing against eq
 end
 %% Plotting 
 % Plot Output Trajectories
-plotMotion(tFlex, yFlex, tData);
-plotMotion(tSim, ySim, tData);
+% plotMotion(tFlex, yFlex, tData);
+% plotMotion(tFlexRigid, yFlexRigid, tData);
 
 % Overlay Motion Plots
-plotCompTbar_flex(tSim,ySim,tFlex,yFlex,tData);
+% plotCompTbar_flex(tFlex,yFlex,tFlexRigid,yFlexRigid,tData);
 
 % print(figure(3),'compTBarFlex_MotionNode3','-depsc');
 % print(figure(4),'compTBarFlex_MotionNode4','-depsc');

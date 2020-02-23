@@ -22,13 +22,14 @@ if(tData.nStr>0) % If strings present in structure
         
         c = tData.damper(k);
         lskdot = q.'*Y{k}*qd;
-        dlsk_dq = qd.'*Y{k}/lsk ;
-        dlskd_dq = dlsk_dq - q.'*Y{k}*qd/lsk^2*dlsk_dq;
+        dlsk_dq = q.'*Y{k}/lsk ;
+        dlskd_dq = qd.'*Y{k}/lsk - q.'*Y{k}*qd/lsk^2*dlsk_dq;
         dlskd_dqd = q.'*Y{k}/lsk;
 
         if isfield(tData,'damper') % If dampers present in structure
             dFd_dq = -c*(Y{k}*q/lsk*dlskd_dq + lskdot*Y{k}/lsk ...
-                        - lskdot*Y{k}*q/lsk^2*dlsk_dq) +dFd_dq;
+                        - lskdot*Y{k}*q/lsk^2*dlsk_dq) ...
+                     + dFd_dq;
             dFd_dqd = -c*Y{k}*q/lsk*dlskd_dqd + dFd_dqd;
         end
     end
@@ -151,7 +152,10 @@ Xhat = reshape(XTq,[ns,tData.nBar]);
 
 Ksys = genKsys(x,tData);
 % xi3 = Cab_En - Mq.'*q - Xq.'*q - Mqd.'*qd + tData.G + extF + Fd;
-dxi3_dq = -(Mq.' + Ksys) - dMqd_dqxqd + dFd_dq; 
+dxi3_dq = -(Mq.' + kron(tData.sigmaEq.',eye(ns))*cell2mat(Y).' ...
+         + kron(tData.psiEq.',eye(ns))*cell2mat(X).') ...
+         - dMqd_dqxqd + dFd_dq; 
+% dxi3_dq = -(Mq.' + Ksys) - dMqd_dqxqd + dFd_dq; 
 dxi3_dqd = -dMq_dqdxq - Mqd.' - dMqd_dqdxqd + dFd_dqd;
 dxi3_dsigma = -Yhat;
 dxi3_dpsi = -Xhat;
@@ -163,13 +167,13 @@ M1 = [Mqdd -Rq.'; -Rq zeros(nLC,nLC)];
 M_alpha = inv(M1);
 M_beta = M_alpha(1:ns,1:ns);
 
-EB = eye(ns) - Rq.'*pinv(Rq.');
-FC = eye(ns) - pinv(Rq)*Rq;
-r1 = rank(Rq.')
-r2 = rank(Rq)
-r3 = rank(EB*Mqdd*FC)
-szM1 = size(M1)
-rM1 = rank(M1)
+% EB = eye(ns) - Rq.'*pinv(Rq.');
+% FC = eye(ns) - pinv(Rq)*Rq;
+% r1 = rank(Rq.')
+% r2 = rank(Rq)
+% r3 = rank(EB*Mqdd*FC)
+% szM1 = size(M1)
+% rM1 = rank(M1)
 
 A = [zeros(ns,ns) eye(ns,ns); 
             M_beta*dxi3_dq M_beta*dxi3_dqd];
