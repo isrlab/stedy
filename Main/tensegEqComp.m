@@ -45,11 +45,13 @@ gradLin = tData.Lin.A; % linear constraint,
 %     gradNLin = [gradNLin;x'*tData.NLin(i).Mat];
 % end
 
-gradR = [gradLin];%;gradNLin];
+gradR = gradLin;%;gradNLin];
 
 %% Setting up linear programming problem
 % Equilibrium equation for dynamics with compressible bars 
 % (eqn. 56) with qdd terms removed.
+
+% Bars
 Mdot = zeros(size(tData.M));
 Mf = Mdot;
 Mq = Mdot;
@@ -83,6 +85,21 @@ for k=1:tData.nBar
 
 end
 Mqd = Mdot - Mf;
+
+% Strings with dampers
+Fd = zeros(ns,1);
+Y = tData.Y;
+for k=1:tData.nStr
+    lsk = q.'*Y{k}*q;
+%     Yk = tData.listY{k};
+    c = tData.damper(k);
+    lskdot = q.'*Y{k}*qd;
+
+    if isfield(tData,'damper') % If dampers present in structure
+        Fd = Fd - c*lskdot*Y{k}*q/lsk;
+    end
+end
+
 %% bars = tData.bars;
 % alpha = cell(1,tData.nBar);
 % lb = zeros(tData.nBar,1);
@@ -105,20 +122,25 @@ Mqd = Mdot - Mf;
 Y = cell2mat(tData.Y);
 X = cell2mat(tData.X);
 L1 = reshape(Y'*q, ns, tData.nStr);
-L2 = -reshape(X'*q, ns, tData.nBar); % - (minus) for compression
+L2 = reshape(X'*q, ns, tData.nBar); % - (minus) for compression
 Aeq = [L1 L2 -gradR'];
 % beq = Xq.'*x;
 
 if(tData.F)
     run('extF_eq');
-    beq = beq + tData.G + extF - Mq.'*q - Mqd.'*qd;
-else beq = beq + tData.G;
+    beq = beq + tData.G + extF - Mq.'*q - Mqd.'*qd + Fd;
+else beq = beq + tData.G + Fd;
 end
 
-LB = [tData.minforce*ones(tData.nStr,1); tData.minforce*ones(tData.nBar,1);...
-        -Inf*ones(nConstr,1)];%1./lb
+% LB = [tData.minforce*ones(tData.nStr,1); tData.minforce*ones(tData.nBar,1);...
+%         -Inf*ones(nConstr,1)];%1./lb
+% UB = [Inf*ones(tData.nStr + nConstr + tData.nBar,1)];%1./lb];
 
-UB = [Inf*ones(tData.nStr + nConstr + tData.nBar,1)];%1./lb];
+LB = [tData.minforce*ones(tData.nStr,1); -Inf*ones(tData.nBar,1);...
+        -Inf*ones(nConstr,1)];    
+
+UB = [Inf*ones(tData.nStr,1); -tData.minforce*ones(tData.nBar,1);...
+         Inf*ones(nConstr,1)];%1./lb];
 options = optimoptions('linprog','Display','iter');
 [SigLamb,fval,exitflag] = linprog([],[],[],Aeq,beq,LB,UB,[],options);
 
