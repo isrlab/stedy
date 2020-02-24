@@ -11,4 +11,4 @@
 % Sinusoidal external force during simulation
 
 %% Tbar
-extF = [zeros(8,1);100*rand(1);zeros(3,1)];
+extF = [zeros(8,1);100*(sin(10*t)+sin(20*t)+cos(15*t)+cos(50*t))/4;zeros(3,1)];

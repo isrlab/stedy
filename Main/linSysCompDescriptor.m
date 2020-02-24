@@ -188,6 +188,6 @@ Bu = [zeros(ns,tData.nStr) zeros(ns,tData.nBar);
 Bf = [zeros(ns,ns); M_beta*dxi3_df];
 
 C = eye(size(A));
-D = zeros(size(Bu));
-sysSS = ss(A, Bu, C, D);
+D = zeros(size(Bf));
+sysSS = ss(A, Bf, C, D);
 end
