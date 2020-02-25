@@ -159,7 +159,7 @@ fprintf('Force Densities in Strings at Equilibrium: \n %s \n',textSprFD)
 fprintf('Force Densities in Bars at Equilibrium: \n %s \n',textBarFD)
 
 
-lhs = kron(sigma.',eye(ns))*Y.'*q - kron(psi.',eye(ns))*X.'*q ...
+lhs = kron(sigma.',eye(ns))*Y.'*q + kron(psi.',eye(ns))*X.'*q ...
         - gradR.'*lamb;
 rhs = beq;    
 %% Computing Total Energy in Structure at Equilibrium

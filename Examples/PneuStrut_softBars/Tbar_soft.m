@@ -80,8 +80,8 @@ tData.F = 1; % If 1, external forces are present in structure, not if 0.
 tDataRigid.F = 1;
 tData.damper = 100*ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
 tDataRigid.damper = 100*ones(1,tData.nStr); % All strings initialised with dampers whose damping coefficient is 1. 
-tData.minforce = 20; % Lower bound for force densities in the strings
-tDataRigid.minforce = 20; % Lower bound for force densities in the strings
+tData.minforce = 0; % Lower bound for force densities in the strings
+tDataRigid.minforce = 0; % Lower bound for force densities in the strings
 tData = tensegEqComp(x0,tData);
 tData.Compressible = 1;
 tDataRigid = tensegEqComp(x0,tDataRigid);
@@ -110,8 +110,10 @@ KredRigid = W.'*KsysRigid*W;
 Cred = inv(Kred); ecRed = eig(Cred);
 CredRigid = inv(KredRigid); ecRedRigid = eig(CredRigid);
 ex = 1:length(ecRed);
+% figure();clf;
 % scatter(ex, ecRed); hold on;
 % scatter(ex, ecRedRigid);
+% legend('soft','rigid');
 
 mTotalSoft = 0; mTotalRigid = 0;
 for k=1:tData.nBar
@@ -142,6 +144,7 @@ Fext(1) = 0; Fext(3) = 0; %Fext(4) = 0;
 deltx = Cred*Fext
 deltxRigid = CredRigid*Fext
 
+%%
 % KsysNew = Ksys; 
 % % KsysNew(3,:) = 2*Ksys(3,:); KsysNew(:,3) = 2*Ksys(:,3); 
 % % KsysNew(6,:) = 2*Ksys(6,:); KsysNew(:,6) = 2*Ksys(:,6);
@@ -162,7 +165,7 @@ x0 = [x0;0]; % Initial Condition - [Position; Velocity; Energy];
 
 options = odeset('RelTol',1e-10,'AbsTol',1e-10);%,'Refine',1);
 
-[simTime,tInt] = tensegSimTime(options,tEnd);
+% [simTime,tInt] = tensegSimTime(options,tEnd);
 
 tData.Correction = 3; % Compressible Bar 
 tDataRigid.Correction = 3; % Compressible Bar 
@@ -170,14 +173,14 @@ x0Sim = x0;
 % x0Sim(9) = x0Sim(9) + 0.1*rand(1);
 % x0Sim(12) = 0.1*rand(1);
 %% Checking for H2
-extF = zeros(ns,length(simTime));
-for t=1:length(simTime)
-    extF(:,t) = [zeros(8,1);100*rand(1);zeros(3,1)];
-end
-tData.extF = extF;
-tDataRigid.extF = extF;
-[tFlex,yFlex] = tensegSim(x0Sim,simTime,tData,options);
-[tFlexRigid,yFlexRigid] = tensegSim(x0Sim,simTime,tDataRigid,options);
+% extF = zeros(ns,length(simTime));
+% for t=1:length(simTime)
+%     extF(:,t) = [zeros(8,1);100*rand(1);zeros(3,1)];
+% end
+% tData.extF = extF;
+% tDataRigid.extF = extF;
+% [tFlex,yFlex] = tensegSim(x0Sim,simTime,tData,options);
+% [tFlexRigid,yFlexRigid] = tensegSim(x0Sim,simTime,tDataRigid,options);
 %% Linearization
 
 [sysSS, Bf] = linSysCompDescriptor(x0, tData);
@@ -214,14 +217,36 @@ minSysRigid = minreal(sysSSRigid);
 % bSys = balred(sysSS,18,opts);
 % pole(bSys)
 
+%% transforming sysSS using constraints
+W2 = zeros(2*ns,2*(ns-nC));
+W2(7,1) = 1; W2(9,2) = 1; W2(10,3) = 1; W2(12,4) = 1;
+W2(19,5) = 1; W2(21,6) = 1; W2(22,7) = 1; W2(24,8) = 1;
+Ared = W2.'*sysSS.A*W2; 
+Bwred = W2.'*sysSS.B; Cred = W2.'*sysSS.C*W2; Dred = zeros(size(Bwred));
+sysSSred = ss(Ared,Bwred,Cred,Dred);
+AredRigid = W2.'*sysSSRigid.A*W2; 
+BwredRigid = W2.'*sysSSRigid.B; CredRigid = W2.'*sysSSRigid.C*W2; 
+DredRigid = zeros(size(Bwred));
+sysSSredRigid = ss(AredRigid,BwredRigid,CredRigid,DredRigid);
+eig(Ared)
+eig(AredRigid)
 %% stabsep
 opt = stabsepOptions('AbsTol',1e-6,'Offset',1e-6);
 [GS,GNS] = stabsep(sysSS,opt);
 [GSRigid,GNS] = stabsep(sysSSRigid,opt);
 pole(GS)
 pole(GSRigid)
-norm(GS)
-norm(GSRigid)
+h2soft = norm(GS)
+h2rigid = norm(GSRigid)
+hinfsoft = norm(GS,Inf)
+hinfRigid = norm(GSRigid,Inf)
+
+Wc = gram(GS,'c'); Wo = gram(GS,'o');
+WcRigid = gram(GSRigid,'c'); WoRigid = gram(GSRigid,'o');
+h2gsoft = trace(GS.C*Wc*GS.C')
+h2gsoft = trace(GS.B'*Wo*GS.B)
+h2gRigid = trace(GSRigid.C*WcRigid*GSRigid.C')
+h2gRigid =  trace(GSRigid.B'*WoRigid*GSRigid.B)
 % figure();
 % pzmap(GS); hold on;
 % pzmap(GSRigid)
@@ -241,26 +266,51 @@ norm(GSRigid)
 
 %% Checking Linear Model against Nonlinear
 % x0delt = zeros(size(x0));%(1:end-1);
-% x0delt(9) = 0.1*rand(1);
-% % x0delt = x0; x0delt(9) = x0delt(9) + 0.1*rand(1);
-% T = 0:0.01:1;
+x0delt = zeros(2*ns,1);
+delt(9) = 0.1*rand(1);
+% x0delt = x0(1:end-1);% x0delt(9) = x0delt(9) + 0.1*rand(1);
+T = 0:0.01:1;
+for t = 1:length(T)
+%     u(t,:) = [zeros(8,1);100*(sin(10*t)+sin(20*t)+cos(15*t)+cos(50*t))/4;zeros(3,1)];
+    u(t,:) = [zeros(8,1);100*rand(1);zeros(3,1)];
+end
 % [tSim,ySim] = ode15s(@linearlagTensegrityDynamics_flex,T,x0delt,options,tData);
-% % % [ysim,tsim,xsim] = lsim(sysSS,zeros(length(T),6),T,x0delt);
+% [ysim,tsim,xsim] = lsim(sysSS,zeros(length(T),6),T,x0delt);
+% [ysim,tsim,xsim] = lsim(sysSS,u,T,x0delt);
+% [ysimRigid,tsim,xsim] = lsim(sysSSRigid,u,T,x0delt);
+[ysim,tsim] = impulse(sysSS,T(end));
+[ysimRigid,tsim] = impulse(sysSSRigid,T(end));
 % % % plot(tSim,ySim(:,12));
 % [tFlex,yFlex] = tensegSim(x0delt+x0,T,tData,options);
-for i=1:length(tFlex)
-%     ySim(i,:) = ySim(i,:) + x0(1:end)';
-    yFlex(i,:) = yFlex(i,:) - x0(1:end)'; % Comparing against eq
-    yFlexRigid(i,:) = yFlexRigid(i,:) - x0(1:end)'; % Comparing against eq
-end
+% for i=1:length(tFlex)
+% %     ySim(i,:) = ySim(i,:) + x0(1:end)';
+%     yFlex(i,:) = yFlex(i,:) - x0(1:end)'; % Comparing against eq
+%     yFlexRigid(i,:) = yFlexRigid(i,:) - x0(1:end)'; % Comparing against eq
+% end
+% for t=1:length(tsim)
+%     ysim(t,:) = ysim(t,:) - x0delt';
+%     ysimRigid(t,:) = ysimRigid(t,:) - x0delt';
+% end
 %% Plotting 
 % Plot Output Trajectories
-% plotMotion(tFlex, yFlex, tData);
-% plotMotion(tFlexRigid, yFlexRigid, tData);
+plotMotion(tFlex, yFlex, tData);
+plotMotion(tFlexRigid, yFlexRigid, tData);
+
+% Plots to disturbance
+% plotMotion(tsim, ysim, tData);
+% plotMotion(tsim, ysimRigid, tDataRigid);
+
+% Impulse response plots
+% plotMotion(tsim, ysim(:,:,9), tData);
+% plotMotion(tsim, ysimRigid(:,:,9), tDataRigid);
+
+
 
 % Overlay Motion Plots
-% plotCompTbar_flex(tFlex,yFlex,tFlexRigid,yFlexRigid,tData);
+plotCompTbar_flex(tFlex,yFlex,tFlexRigid,yFlexRigid,tData);
 
 % print(figure(3),'compTBarFlex_MotionNode3','-depsc');
 % print(figure(4),'compTBarFlex_MotionNode4','-depsc');
 
+% load('simSinRandomForce.mat')
+% load('doubletNL.mat');
